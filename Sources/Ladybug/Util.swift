@@ -940,7 +940,8 @@ internal func ladybugValueToSwift(_ cValue: inout ladybug_value) throws -> Any? 
         )
     case LADYBUG_BLOB:
         var cBlobValue: UnsafeMutablePointer<UInt8>?
-        let state = ladybug_value_get_blob(&cValue, &cBlobValue)
+        var blobLength: UInt64 = 0
+        let state = ladybug_value_get_blob(&cValue, &cBlobValue, &blobLength)
         if state != LadybugSuccess {
             throw LadybugError.getValueFailed(
                 "Failed to get blob value with status \(state)"
@@ -949,8 +950,7 @@ internal func ladybugValueToSwift(_ cValue: inout ladybug_value) throws -> Any? 
         defer {
             ladybug_destroy_blob(cBlobValue)
         }
-        let blobSize = strlen(cBlobValue!)
-        let blobData = Data(bytes: cBlobValue!, count: blobSize)
+        let blobData = Data(bytes: cBlobValue!, count: Int(blobLength))
         return blobData
     case LADYBUG_DECIMAL:
         var outString: UnsafeMutablePointer<CChar>?
