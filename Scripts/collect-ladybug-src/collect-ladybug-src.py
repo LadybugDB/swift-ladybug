@@ -62,6 +62,15 @@ except FileNotFoundError:
 
 PACKAGE_SWIFT_TEMPLATE = Template(PACKAGE_SWIFT_TEMPLATE)
 
+# Fix the recursive symlink in the submodule
+lbug_src_symlink = os.path.join(LADYBUG_ROOT_DIR, "tools", "rust_api", "lbug-src")
+if os.path.islink(lbug_src_symlink):
+    current_target = os.readlink(lbug_src_symlink)
+    if current_target == "../..":
+        os.unlink(lbug_src_symlink)
+        os.symlink(LADYBUG_ROOT_DIR, lbug_src_symlink)
+        logger.info("Fixed lbug-src symlink to absolute path")
+
 logger.info("Cleaning build directory...")
 status = Popen("make clean", cwd=LADYBUG_ROOT_DIR, shell=True).wait()
 if status != 0:
