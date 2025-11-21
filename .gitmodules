@@ -1,3 +1,3 @@
-[submodule "Sources/Ladybug"]
-	path = Sources/Ladybug
+[submodule "Sources/LadybugCpp"]
+	path = Sources/LadybugCpp
 	url = https://github.com/LadybugDB/ladybug
