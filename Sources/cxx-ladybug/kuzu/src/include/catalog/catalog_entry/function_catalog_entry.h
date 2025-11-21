@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace catalog {
 
-class KUZU_API FunctionCatalogEntry : public CatalogEntry {
+class LADYBUG_API FunctionCatalogEntry : public CatalogEntry {
 public:
     //===--------------------------------------------------------------------===//
     // constructors

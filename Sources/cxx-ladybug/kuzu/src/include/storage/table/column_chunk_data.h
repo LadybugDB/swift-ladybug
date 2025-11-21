@@ -90,7 +90,7 @@ struct ChunkState {
 
 class Spiller;
 // Base data segment covers all fixed-sized data types.
-class KUZU_API ColumnChunkData {
+class LADYBUG_API ColumnChunkData {
 public:
     friend struct ColumnChunkFactory;
     // For spilling to disk, we need access to the underlying buffer
@@ -166,7 +166,7 @@ public:
         const ColumnChunkMetadata& metadata) const;
 
     static common::page_idx_t getNumPagesForBytes(uint64_t numBytes) {
-        return (numBytes + common::KUZU_PAGE_SIZE - 1) / common::KUZU_PAGE_SIZE;
+        return (numBytes + common::LADYBUG_PAGE_SIZE - 1) / common::LADYBUG_PAGE_SIZE;
     }
 
     uint64_t getNumBytesPerValue() const { return numBytesPerValue; }
@@ -403,7 +403,7 @@ public:
     common::NullMask getNullMask() const;
 };
 
-class KUZU_API InternalIDChunkData final : public ColumnChunkData {
+class LADYBUG_API InternalIDChunkData final : public ColumnChunkData {
 public:
     // TODO(Guodong): Should make InternalIDChunkData has no NULL.
     // Physically, we only materialize offset of INTERNAL_ID, which is same as UINT64,

@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API ConnectionException : public Exception {
+class LADYBUG_API ConnectionException : public Exception {
 public:
     explicit ConnectionException(const std::string& msg)
         : Exception("Connection exception: " + msg){};

@@ -11,23 +11,23 @@ logger = logging.getLogger(__name__)
 
 INDENTATION = "    "*4
 
-KUZU = "ladybug"
-CXX_KUZU = "cxx-ladybug"
+LADYBUG = "ladybug"
+CXX_LADYBUG = "cxx-ladybug"
 PACKAGE_SWIFT = "Package.swift"
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-KUZU_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, KUZU))
-KUZU_SRC_DIR = os.path.abspath(os.path.join(KUZU_ROOT_DIR, "src"))
-KUZU_EXTENSION_DIR = os.path.abspath(os.path.join(KUZU_ROOT_DIR, "extension"))
-KUZU_THIRD_PARTY_DIR = os.path.abspath(os.path.join(KUZU_ROOT_DIR, "third_party"))
-KUZU_BUILD_DIR = os.path.abspath(os.path.join(KUZU_ROOT_DIR, "build"))
-KUZU_C_HEADER = os.path.abspath(os.path.join(KUZU_SRC_DIR, "include", "c_api", "ladybug.h"))
-CXX_KUZU_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, "Sources", CXX_KUZU))
-TARGET_DIR = os.path.abspath(os.path.join(CXX_KUZU_ROOT_DIR, KUZU))
+LADYBUG_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, LADYBUG))
+LADYBUG_SRC_DIR = os.path.abspath(os.path.join(LADYBUG_ROOT_DIR, "src"))
+LADYBUG_EXTENSION_DIR = os.path.abspath(os.path.join(LADYBUG_ROOT_DIR, "extension"))
+LADYBUG_THIRD_PARTY_DIR = os.path.abspath(os.path.join(LADYBUG_ROOT_DIR, "third_party"))
+LADYBUG_BUILD_DIR = os.path.abspath(os.path.join(LADYBUG_ROOT_DIR, "build"))
+LADYBUG_C_HEADER = os.path.abspath(os.path.join(LADYBUG_SRC_DIR, "include", "c_api", "ladybug.h"))
+CXX_LADYBUG_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, "Sources", CXX_LADYBUG))
+TARGET_DIR = os.path.abspath(os.path.join(CXX_LADYBUG_ROOT_DIR, LADYBUG))
 TARGET_SRC_DIR = os.path.abspath(os.path.join(TARGET_DIR, "src"))
 TARGET_EXTENSION_DIR = os.path.abspath(os.path.join(TARGET_DIR, "extension"))
 TARGET_THIRD_PARTY_DIR = os.path.abspath(os.path.join(TARGET_DIR, "third_party"))
-TARGET_INCLUDE_DIR = os.path.abspath(os.path.join(CXX_KUZU_ROOT_DIR, "include"))
+TARGET_INCLUDE_DIR = os.path.abspath(os.path.join(CXX_LADYBUG_ROOT_DIR, "include"))
 OUTPUT_PATH = os.path.abspath(os.path.join(ROOT_DIR, PACKAGE_SWIFT))
 MANUAL_INCLUDE_DIRS = [
     "ladybug/third_party/simsimd/include",
@@ -62,20 +62,20 @@ except FileNotFoundError:
 PACKAGE_SWIFT_TEMPLATE = Template(PACKAGE_SWIFT_TEMPLATE)
 
 logger.info("Cleaning build directory...")
-status = Popen("make clean", cwd=KUZU_ROOT_DIR, shell=True).wait()
+status = Popen("make clean", cwd=LADYBUG_ROOT_DIR, shell=True).wait()
 if status != 0:
     logger.error("Failed to clean build directory")
     exit(1)
 
 logger.info("Generating cmake compile commands...")
-os.makedirs(KUZU_BUILD_DIR, exist_ok=True)
+os.makedirs(LADYBUG_BUILD_DIR, exist_ok=True)
 
-status = Popen("cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHELL=FALSE -DBUILD_BENCHMARK=FALSE -DBUILD_TESTS=FALSE -DBUILD_SWIFT=TRUE ..", cwd=KUZU_BUILD_DIR, shell=True).wait()
+status = Popen("cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHELL=FALSE -DBUILD_BENCHMARK=FALSE -DBUILD_TESTS=FALSE -DBUILD_SWIFT=TRUE ..", cwd=LADYBUG_BUILD_DIR, shell=True).wait()
 if status != 0:
     logger.error("Failed to cmake ladybug")
     exit(1)
 
-compile_commands_file = os.path.abspath(os.path.join(KUZU_BUILD_DIR, "compile_commands.json"))
+compile_commands_file = os.path.abspath(os.path.join(LADYBUG_BUILD_DIR, "compile_commands.json"))
 if not os.path.exists(compile_commands_file):
     logger.error("Failed to find compile_commands.json")
     exit(1)
@@ -91,14 +91,14 @@ for command in compile_commands:
     for arg in command_to_decode:
         if arg.startswith("-I"):
             include_dir = arg.split("-I")[1]
-            include_dir = os.path.relpath(include_dir, KUZU_ROOT_DIR)
-            include_dir = os.path.join(KUZU, include_dir)
+            include_dir = os.path.relpath(include_dir, LADYBUG_ROOT_DIR)
+            include_dir = os.path.join(LADYBUG, include_dir)
             include_dirs.add(include_dir)
     for arg in command_to_decode:
         if arg.startswith("-D"):
             define = arg.split("-D")[1].replace("\\", "")
-            if define.startswith("KUZU_ROOT_DIRECTORY"):
-                define = define.replace(KUZU_ROOT_DIR, KUZU)
+            if define.startswith("LADYBUG_ROOT_DIRECTORY"):
+                define = define.replace(LADYBUG_ROOT_DIR, LADYBUG)
             # Skip defines that are not relevant to the build
             if define.startswith("__64BIT__") or define.startswith("__32BIT__"):
                 continue
@@ -113,8 +113,8 @@ include_dirs = include_dirs.union(MANUAL_INCLUDE_DIRS)
 files_to_compile = set()
 for command in compile_commands:
     file_path = command["file"]
-    file_relative_path = os.path.relpath(file_path, KUZU_ROOT_DIR)
-    file_relative_path = os.path.join(KUZU, file_relative_path)
+    file_relative_path = os.path.relpath(file_path, LADYBUG_ROOT_DIR)
+    file_relative_path = os.path.join(LADYBUG, file_relative_path)
     files_to_compile.add(file_relative_path)
 
 logger.info("Files to compile: %d", len(files_to_compile))
@@ -125,20 +125,20 @@ shutil.rmtree(TARGET_DIR, ignore_errors=True)
 os.makedirs(TARGET_DIR, exist_ok=True)
 os.makedirs(TARGET_INCLUDE_DIR, exist_ok=True)
 logger.info("Copying third party dependencies...")
-shutil.copytree(KUZU_THIRD_PARTY_DIR, TARGET_THIRD_PARTY_DIR)
+shutil.copytree(LADYBUG_THIRD_PARTY_DIR, TARGET_THIRD_PARTY_DIR)
 
 logger.info("Copying source code...")
-shutil.copytree(KUZU_SRC_DIR, TARGET_SRC_DIR)
+shutil.copytree(LADYBUG_SRC_DIR, TARGET_SRC_DIR)
 
 logger.info("Copying extension code...")
-shutil.copytree(KUZU_EXTENSION_DIR, TARGET_EXTENSION_DIR)
+shutil.copytree(LADYBUG_EXTENSION_DIR, TARGET_EXTENSION_DIR)
 
 logger.info("Copying include code...")
-shutil.copy(KUZU_C_HEADER, TARGET_INCLUDE_DIR)
+shutil.copy(LADYBUG_C_HEADER, TARGET_INCLUDE_DIR)
 
 logger.info("Copying manually-defined source code...")
 for src in MANUAL_SRC_COPY:
-    src_path = os.path.join(KUZU_ROOT_DIR, src)
+    src_path = os.path.join(LADYBUG_ROOT_DIR, src)
     if os.path.exists(src_path):
         shutil.copytree(src_path, os.path.join(TARGET_DIR, src))
     else:

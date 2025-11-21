@@ -11,7 +11,7 @@ class ClientContext;
 
 namespace function {
 
-struct KUZU_API FunctionBindData {
+struct LADYBUG_API FunctionBindData {
     std::vector<common::LogicalType> paramTypes;
     common::LogicalType resultType;
     // TODO: the following two fields should be moved to FunctionLocalState.
@@ -58,7 +58,7 @@ struct ScalarBindFuncInput {
 using scalar_bind_func =
     std::function<std::unique_ptr<FunctionBindData>(const ScalarBindFuncInput& bindInput)>;
 
-struct KUZU_API Function {
+struct LADYBUG_API Function {
     std::string name;
     std::vector<common::LogicalTypeID> parameterTypeIDs;
     // Currently we only one variable-length function which is list creation. The expectation is

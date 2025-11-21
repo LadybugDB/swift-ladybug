@@ -169,7 +169,7 @@ void Checkpointer::writeDatabaseHeader(const DatabaseHeader& header) {
     auto shadowHeader = ShadowUtils::createShadowVersionIfNecessaryAndPinPage(
         common::StorageConstants::DB_HEADER_PAGE_IDX, true /* skipReadingOriginalPage */, *dataFH,
         shadowFile);
-    memcpy(shadowHeader.frame, headerPage.data(), common::KUZU_PAGE_SIZE);
+    memcpy(shadowHeader.frame, headerPage.data(), common::LADYBUG_PAGE_SIZE);
     shadowFile.getShadowingFH().unpinPage(shadowHeader.shadowPage);
 }
 
@@ -244,7 +244,7 @@ static void validateMagicBytes(common::Deserializer& deSer) {
     }
     if (memcmp(magicBytes, StorageVersionInfo::MAGIC_BYTES, numMagicBytes) != 0) {
         throw common::RuntimeException(
-            "Unable to open database. The file is not a valid Kuzu database file!");
+            "Unable to open database. The file is not a valid Ladybug database file!");
     }
 }
 
@@ -268,7 +268,7 @@ static DatabaseHeader readDatabaseHeader(common::Deserializer& deSer) {
 DatabaseHeader Checkpointer::getCurrentDatabaseHeader() const {
     static const auto defaultHeader = DatabaseHeader{{}, {}};
     auto dataFileInfo = clientContext.getStorageManager()->getDataFH()->getFileInfo();
-    if (dataFileInfo->getFileSize() < common::KUZU_PAGE_SIZE) {
+    if (dataFileInfo->getFileSize() < common::LADYBUG_PAGE_SIZE) {
         // If the data file hasn't been written to there is no existing database header
         return defaultHeader;
     }
@@ -305,10 +305,10 @@ void Checkpointer::readCheckpoint(main::ClientContext* context, catalog::Catalog
         return;
     }
     deSer.getReader()->cast<common::BufferedFileReader>()->resetReadOffset(
-        currentHeader.catalogPageRange.startPageIdx * common::KUZU_PAGE_SIZE);
+        currentHeader.catalogPageRange.startPageIdx * common::LADYBUG_PAGE_SIZE);
     catalog->deserialize(deSer);
     deSer.getReader()->cast<common::BufferedFileReader>()->resetReadOffset(
-        currentHeader.metadataPageRange.startPageIdx * common::KUZU_PAGE_SIZE);
+        currentHeader.metadataPageRange.startPageIdx * common::LADYBUG_PAGE_SIZE);
     storageManager->deserialize(context, catalog, deSer);
     storageManager->getDataFH()->getPageManager()->deserialize(deSer);
 }

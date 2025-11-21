@@ -12,8 +12,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "Kuzu",
-            targets: ["Kuzu"]),
+            name: "Ladybug",
+            targets: ["Ladybug"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-docc-plugin", branch: "1.4.5"),
@@ -22,7 +22,7 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Kuzu",
+            name: "Ladybug",
             dependencies: ["cxx-ladybug"]
         ),
         .target(
@@ -1133,10 +1133,10 @@ let package = Package(
                 .define("ANTLR4CPP_STATIC"),
                 .define("BM_MALLOC"),
                 .define("HAS_FULLFSYNC"),
-                .define("KUZU_CMAKE_VERSION", to: "\"0.11.3\""),
-                .define("KUZU_EXPORTS"),
-                .define("KUZU_EXTENSION_VERSION", to: "\"0.11.3\""),
-                .define("KUZU_ROOT_DIRECTORY", to: "\"ladybug\""),
+                .define("LADYBUG_CMAKE_VERSION", to: "\"0.11.3\""),
+                .define("LADYBUG_EXPORTS"),
+                .define("LADYBUG_EXTENSION_VERSION", to: "\"0.11.3\""),
+                .define("LADYBUG_ROOT_DIRECTORY", to: "\"ladybug\""),
                 .define("ZSTDERRORLIB_VISIBILITY", to: ""),
                 .define("ZSTDLIB_VISIBILITY", to: ""),
                 .define("__SWIFT__"),
@@ -1144,8 +1144,8 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "KuzuTests",
-            dependencies: ["Kuzu"],
+            name: "LadybugTests",
+            dependencies: ["Ladybug"],
             resources: [
                 .copy("Dataset")
             ],

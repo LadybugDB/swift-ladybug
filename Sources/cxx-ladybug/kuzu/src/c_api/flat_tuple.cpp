@@ -23,13 +23,13 @@ ladybug_state ladybug_flat_tuple_get_value(ladybug_flat_tuple* flat_tuple, uint6
     try {
         _value = flat_tuple_ptr->getValue(index);
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
     out_value->_value = _value;
     // We set the ownership of the value to C++, so it will not be deleted if the value is destroyed
     // in C.
     out_value->_is_owned_by_cpp = true;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 char* ladybug_flat_tuple_to_string(ladybug_flat_tuple* flat_tuple) {

@@ -40,12 +40,12 @@ public final class FlatTuple: CustomStringConvertible, @unchecked Sendable {
     /// Returns the value at the given index in the FlatTuple.
     /// - Parameter index: The index of the value to retrieve.
     /// - Returns: The value at the specified index, or nil if the value is null.
-    /// - Throws: `KuzuError.getValueFailed` if retrieving the value fails.
+    /// - Throws: `LadybugError.getValueFailed` if retrieving the value fails.
     public func getValue(_ index: UInt64) throws -> Any? {
         var cValue = ladybug_value()
         let state = ladybug_flat_tuple_get_value(&cFlatTuple, index, &cValue)
-        if state != KuzuSuccess {
-            throw KuzuError.getValueFailed(
+        if state != LadybugSuccess {
+            throw LadybugError.getValueFailed(
                 "Get value failed with error code: \(state)"
             )
         }
@@ -56,7 +56,7 @@ public final class FlatTuple: CustomStringConvertible, @unchecked Sendable {
     /// Returns the values of the FlatTuple as a dictionary.
     /// The keys of the dictionary are the column names in the query result.
     /// - Returns: A dictionary mapping column names to their corresponding values.
-    /// - Throws: `KuzuError.getValueFailed` if retrieving any value fails.
+    /// - Throws: `LadybugError.getValueFailed` if retrieving any value fails.
     public func getAsDictionary() throws -> [String: Any?] {
         var result: [String: Any] = [:]
         let keys = queryResult.getColumnNames()
@@ -71,7 +71,7 @@ public final class FlatTuple: CustomStringConvertible, @unchecked Sendable {
     /// Returns the values of the FlatTuple as an array.
     /// The order of the values in the array is the same as the order of the columns in the query result.
     /// - Returns: An array containing all values in the tuple.
-    /// - Throws: `KuzuError.getValueFailed` if retrieving any value fails.
+    /// - Throws: `LadybugError.getValueFailed` if retrieving any value fails.
     public func getAsArray() throws -> [Any?] {
         var result: [Any?] = []
         let count = queryResult.getColumnCount()

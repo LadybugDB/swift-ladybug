@@ -42,7 +42,7 @@ struct BatchInsertInfo {
     }
 };
 
-struct KUZU_API BatchInsertSharedState {
+struct LADYBUG_API BatchInsertSharedState {
     std::mutex mtx;
     std::atomic<common::row_idx_t> numRows;
 
@@ -88,7 +88,7 @@ struct BatchInsertLocalState {
     }
 };
 
-class KUZU_API BatchInsert : public Sink {
+class LADYBUG_API BatchInsert : public Sink {
     static constexpr PhysicalOperatorType type_ = PhysicalOperatorType::BATCH_INSERT;
 
 public:

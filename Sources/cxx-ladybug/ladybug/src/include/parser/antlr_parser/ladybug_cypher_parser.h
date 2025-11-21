@@ -9,10 +9,10 @@
 namespace ladybug {
 namespace parser {
 
-class KuzuCypherParser : public CypherParser {
+class LadybugCypherParser : public CypherParser {
 
 public:
-    explicit KuzuCypherParser(antlr4::TokenStream* input) : CypherParser(input) {}
+    explicit LadybugCypherParser(antlr4::TokenStream* input) : CypherParser(input) {}
 
     void notifyQueryNotConcludeWithReturn(antlr4::Token* startToken) override;
 

@@ -10,7 +10,7 @@ class ClientContext;
 }
 namespace extension {
 
-class KUZU_API ExtensionLoader {
+class LADYBUG_API ExtensionLoader {
 public:
     explicit ExtensionLoader(std::string extensionName) : extensionName{std::move(extensionName)} {}
 

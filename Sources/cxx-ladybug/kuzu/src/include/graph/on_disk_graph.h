@@ -121,7 +121,7 @@ private:
     common::offset_t endOffsetExclusive;
 };
 
-class KUZU_API OnDiskGraph final : public Graph {
+class LADYBUG_API OnDiskGraph final : public Graph {
 public:
     OnDiskGraph(main::ClientContext* context, NativeGraphEntry entry);
 

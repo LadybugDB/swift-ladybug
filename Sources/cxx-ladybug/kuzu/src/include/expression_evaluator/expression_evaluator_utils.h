@@ -8,7 +8,7 @@ namespace ladybug {
 namespace evaluator {
 
 struct ExpressionEvaluatorUtils {
-    static KUZU_API common::Value evaluateConstantExpression(
+    static LADYBUG_API common::Value evaluateConstantExpression(
         std::shared_ptr<binder::Expression> expression, main::ClientContext* clientContext);
 };
 

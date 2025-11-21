@@ -9,7 +9,7 @@ class Transaction;
 
 namespace storage {
 
-class KUZU_API InMemChunkedNodeGroupCollection {
+class LADYBUG_API InMemChunkedNodeGroupCollection {
 public:
     explicit InMemChunkedNodeGroupCollection(std::vector<common::LogicalType> types)
         : types{std::move(types)} {}

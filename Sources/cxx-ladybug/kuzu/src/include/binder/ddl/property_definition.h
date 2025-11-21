@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace binder {
 
-struct KUZU_API ColumnDefinition {
+struct LADYBUG_API ColumnDefinition {
     std::string name;
     common::LogicalType type;
 
@@ -19,7 +19,7 @@ private:
     ColumnDefinition(const ColumnDefinition& other) : name{other.name}, type{other.type.copy()} {}
 };
 
-struct KUZU_API PropertyDefinition {
+struct LADYBUG_API PropertyDefinition {
     ColumnDefinition columnDefinition;
     std::unique_ptr<parser::ParsedExpression> defaultExpr;
 

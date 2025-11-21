@@ -7,7 +7,7 @@
 namespace ladybug {
 namespace binder {
 
-class KUZU_API BoundTableFunctionCall : public BoundReadingClause {
+class LADYBUG_API BoundTableFunctionCall : public BoundReadingClause {
     static constexpr common::ClauseType clauseType_ = common::ClauseType::TABLE_FUNCTION_CALL;
 
 public:

@@ -5,7 +5,7 @@
 namespace ladybug {
 namespace extension {
 
-class KUZU_API CatalogExtension : public catalog::Catalog {
+class LADYBUG_API CatalogExtension : public catalog::Catalog {
 public:
     CatalogExtension() : Catalog() {}
 

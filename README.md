@@ -1,6 +1,6 @@
 # swift-ladybug
 
-Official Swift language binding for [Kuzu](https://github.com/LadybugDB/ladybug). Kuzu an embeddable property graph database management system built for query speed and scalability. For more information, please visit the [Kuzu GitHub repository](https://github.com/LadybugDB/ladybug) or the [Kuzu website](https://ladybugdb.com).
+Official Swift language binding for [Ladybug](https://github.com/LadybugDB/ladybug). Ladybug an embeddable property graph database management system built for query speed and scalability. For more information, please visit the [Ladybug GitHub repository](https://github.com/LadybugDB/ladybug) or the [Ladybug website](https://ladybugdb.com).
 
 ## Get started
 
@@ -8,10 +8,10 @@ To add swift-ladybug to your Swift project, you can use the Swift Package Manage
 
 1. Add `.package(url: "https://github.com/LadybugDB/swift-ladybug/", branch: "main"),` to your Package.swift dependencies.
    You can change the branch to a tag to use a specific version, e.g., `.package(url: "https://github.com/LadybugDB/swift-ladybug/", branch: "0.11.0"),` to use version 0.11.0.
-2. Add `Kuzu` to your target dependencies.
+2. Add `Ladybug` to your target dependencies.
    ```swift
     dependencies: [
-        .product(name: "Kuzu", package: "swift-ladybug"),
+        .product(name: "Ladybug", package: "swift-ladybug"),
     ]
     ```
 

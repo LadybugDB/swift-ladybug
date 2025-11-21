@@ -49,7 +49,7 @@ namespace main {
 struct DBConfig;
 class Database;
 class DatabaseManager;
-class AttachedKuzuDatabase;
+class AttachedLadybugDatabase;
 struct SpillToDiskSetting;
 struct ExtensionOption;
 class EmbeddedShell;
@@ -66,7 +66,7 @@ struct ActiveQuery {
  * @brief Contain client side configuration. We make profiler associated per query, so the profiler
  * is not maintained in the client context.
  */
-class KUZU_API ClientContext {
+class LADYBUG_API ClientContext {
     friend class Connection;
     friend class binder::Binder;
     friend class binder::ExpressionBinder;
@@ -145,7 +145,7 @@ public:
     static std::string getEnvVariable(const std::string& name);
     static std::string getUserHomeDir();
 
-    void setDefaultDatabase(AttachedKuzuDatabase* defaultDatabase_);
+    void setDefaultDatabase(AttachedLadybugDatabase* defaultDatabase_);
     bool hasDefaultDatabase() const;
     void setUseInternalCatalogEntry(bool useInternalCatalogEntry) {
         this->useInternalCatalogEntry_ = useInternalCatalogEntry;
@@ -250,7 +250,7 @@ private:
     // Local database.
     Database* localDatabase;
     // Remote database.
-    AttachedKuzuDatabase* remoteDatabase;
+    AttachedLadybugDatabase* remoteDatabase;
     // Progress bar.
     std::unique_ptr<common::ProgressBar> progressBar;
     // Warning information

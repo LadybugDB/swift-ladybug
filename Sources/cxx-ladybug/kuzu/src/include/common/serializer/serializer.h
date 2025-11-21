@@ -13,7 +13,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API Serializer {
+class LADYBUG_API Serializer {
 public:
     explicit Serializer(std::shared_ptr<Writer> writer) : writer(std::move(writer)) {}
 

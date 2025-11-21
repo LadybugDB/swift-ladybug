@@ -123,7 +123,7 @@ ColumnChunkMetadata GetBitpackingMetadata::operator()(std::span<const uint8_t> /
             },
             [&](auto) {});
     }
-    const auto numValuesPerPage = compMeta.numValues(KUZU_PAGE_SIZE, dataType);
+    const auto numValuesPerPage = compMeta.numValues(LADYBUG_PAGE_SIZE, dataType);
     const auto numPages =
         numValuesPerPage == UINT64_MAX ?
             0 :
@@ -232,7 +232,7 @@ ColumnChunkMetadata GetFloatCompressionMetadata<T>::operator()(std::span<const u
         return uncompressedGetMetadataInternal(buffer.size(), numValues, min, max);
     }
 
-    const auto numValuesPerPage = compMeta.numValues(KUZU_PAGE_SIZE, dataType);
+    const auto numValuesPerPage = compMeta.numValues(LADYBUG_PAGE_SIZE, dataType);
     const auto numPagesForEncoded = ceilDiv(capacity, numValuesPerPage);
     const auto numPagesForExceptions =
         EncodeException<T>::numPagesFromExceptions(floatMetadata->exceptionCapacity);

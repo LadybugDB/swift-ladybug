@@ -46,7 +46,7 @@ class DatabaseManager;
 /**
  * @brief Stores runtime configuration for creating or opening a Database
  */
-struct KUZU_API SystemConfig {
+struct LADYBUG_API SystemConfig {
     /**
      * @brief Creates a SystemConfig object.
      * @param bufferPoolSize Max size of the buffer pool in bytes.
@@ -93,7 +93,7 @@ struct KUZU_API SystemConfig {
 };
 
 /**
- * @brief Database class is the main class of Kuzu. It manages all database components.
+ * @brief Database class is the main class of Ladybug. It manages all database components.
  */
 class Database {
     friend class EmbeddedShell;
@@ -112,41 +112,41 @@ public:
      *        an in-memory database.
      * @param systemConfig System configurations (buffer pool size and max num threads).
      */
-    KUZU_API explicit Database(std::string_view databasePath,
+    LADYBUG_API explicit Database(std::string_view databasePath,
         SystemConfig systemConfig = SystemConfig());
     /**
      * @brief Destructs the database object.
      */
-    KUZU_API ~Database();
+    LADYBUG_API ~Database();
 
-    KUZU_API void registerFileSystem(std::unique_ptr<common::FileSystem> fs);
+    LADYBUG_API void registerFileSystem(std::unique_ptr<common::FileSystem> fs);
 
-    KUZU_API void registerStorageExtension(std::string name,
+    LADYBUG_API void registerStorageExtension(std::string name,
         std::unique_ptr<storage::StorageExtension> storageExtension);
 
-    KUZU_API void addExtensionOption(std::string name, common::LogicalTypeID type,
+    LADYBUG_API void addExtensionOption(std::string name, common::LogicalTypeID type,
         common::Value defaultValue, bool isConfidential = false);
 
-    KUZU_API void addTransformerExtension(
+    LADYBUG_API void addTransformerExtension(
         std::unique_ptr<extension::TransformerExtension> transformerExtension);
 
     std::vector<extension::TransformerExtension*> getTransformerExtensions();
 
-    KUZU_API void addBinderExtension(
+    LADYBUG_API void addBinderExtension(
         std::unique_ptr<extension::BinderExtension> transformerExtension);
 
     std::vector<extension::BinderExtension*> getBinderExtensions();
 
-    KUZU_API void addPlannerExtension(
+    LADYBUG_API void addPlannerExtension(
         std::unique_ptr<extension::PlannerExtension> plannerExtension);
 
     std::vector<extension::PlannerExtension*> getPlannerExtensions();
 
-    KUZU_API void addMapperExtension(std::unique_ptr<extension::MapperExtension> mapperExtension);
+    LADYBUG_API void addMapperExtension(std::unique_ptr<extension::MapperExtension> mapperExtension);
 
     std::vector<extension::MapperExtension*> getMapperExtensions();
 
-    KUZU_API catalog::Catalog* getCatalog() { return catalog.get(); }
+    LADYBUG_API catalog::Catalog* getCatalog() { return catalog.get(); }
 
     const DBConfig& getConfig() const { return dbConfig; }
 

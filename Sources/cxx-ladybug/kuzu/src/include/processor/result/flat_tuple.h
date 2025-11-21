@@ -21,15 +21,15 @@ public:
     /**
      * @return number of values in the FlatTuple.
      */
-    KUZU_API uint32_t len() const;
+    LADYBUG_API uint32_t len() const;
 
     /**
      * @param idx value index to get.
      * @return the value stored at idx.
      */
-    KUZU_API common::Value* getValue(uint32_t idx) const;
+    LADYBUG_API common::Value* getValue(uint32_t idx) const;
 
-    KUZU_API std::string toString();
+    LADYBUG_API std::string toString();
 
     /**
      * @param colsWidth The length of each column
@@ -38,7 +38,7 @@ public:
      * characters of each column will be displayed.
      * @return all values in string format.
      */
-    KUZU_API std::string toString(const std::vector<uint32_t>& colsWidth,
+    LADYBUG_API std::string toString(const std::vector<uint32_t>& colsWidth,
         const std::string& delimiter = "|", uint32_t maxWidth = -1);
 
 private:

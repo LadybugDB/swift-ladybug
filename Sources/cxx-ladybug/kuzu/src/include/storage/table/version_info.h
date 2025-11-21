@@ -13,7 +13,7 @@ namespace storage {
 class ChunkedNodeGroup;
 struct VectorVersionInfo;
 
-class KUZU_API VersionInfo {
+class LADYBUG_API VersionInfo {
 public:
     VersionInfo();
     ~VersionInfo();

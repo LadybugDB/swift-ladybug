@@ -110,8 +110,8 @@ public:
 
     SelectionVector();
 
-    KUZU_API void setToUnfiltered();
-    KUZU_API void setToUnfiltered(sel_t size);
+    LADYBUG_API void setToUnfiltered();
+    LADYBUG_API void setToUnfiltered(sel_t size);
     void setRange(sel_t startPos, sel_t size) {
         KU_ASSERT(startPos + size <= capacity);
         selectedPositions = selectedPositionsBuffer.get();

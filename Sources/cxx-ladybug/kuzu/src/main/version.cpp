@@ -5,7 +5,7 @@
 namespace ladybug {
 namespace main {
 const char* Version::getVersion() {
-    return KUZU_CMAKE_VERSION;
+    return LADYBUG_CMAKE_VERSION;
 }
 
 uint64_t Version::getStorageVersion() {

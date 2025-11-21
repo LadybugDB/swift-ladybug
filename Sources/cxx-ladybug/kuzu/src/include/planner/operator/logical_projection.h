@@ -7,7 +7,7 @@
 namespace ladybug {
 namespace planner {
 
-class KUZU_API LogicalProjection : public LogicalOperator {
+class LADYBUG_API LogicalProjection : public LogicalOperator {
     static constexpr LogicalOperatorType type_ = LogicalOperatorType::PROJECTION;
 
 public:

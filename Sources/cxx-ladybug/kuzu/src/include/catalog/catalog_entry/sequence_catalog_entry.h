@@ -44,7 +44,7 @@ struct SequenceData {
 };
 
 class CatalogSet;
-class KUZU_API SequenceCatalogEntry final : public CatalogEntry {
+class LADYBUG_API SequenceCatalogEntry final : public CatalogEntry {
 public:
     //===--------------------------------------------------------------------===//
     // constructors

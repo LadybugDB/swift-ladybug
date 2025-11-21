@@ -38,10 +38,10 @@ ladybug_state ladybug_query_result_get_column_name(ladybug_query_result* query_r
     char** out_column_name) {
     auto column_names = static_cast<QueryResult*>(query_result->_query_result)->getColumnNames();
     if (index >= column_names.size()) {
-        return KuzuError;
+        return LadybugError;
     }
     *out_column_name = convertToOwnedCString(column_names[index]);
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_query_result_get_column_data_type(ladybug_query_result* query_result, uint64_t index,
@@ -49,11 +49,11 @@ ladybug_state ladybug_query_result_get_column_data_type(ladybug_query_result* qu
     auto column_data_types =
         static_cast<QueryResult*>(query_result->_query_result)->getColumnDataTypes();
     if (index >= column_data_types.size()) {
-        return KuzuError;
+        return LadybugError;
     }
     const auto& column_data_type = column_data_types[index];
     out_column_data_type->_data_type = new LogicalType(column_data_type.copy());
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 uint64_t ladybug_query_result_get_num_tuples(ladybug_query_result* query_result) {
@@ -63,11 +63,11 @@ uint64_t ladybug_query_result_get_num_tuples(ladybug_query_result* query_result)
 ladybug_state ladybug_query_result_get_query_summary(ladybug_query_result* query_result,
     ladybug_query_summary* out_query_summary) {
     if (out_query_summary == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
     auto query_summary = static_cast<QueryResult*>(query_result->_query_result)->getQuerySummary();
     out_query_summary->_query_summary = query_summary;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 bool ladybug_query_result_has_next(ladybug_query_result* query_result) {
@@ -81,16 +81,16 @@ bool ladybug_query_result_has_next_query_result(ladybug_query_result* query_resu
 ladybug_state ladybug_query_result_get_next_query_result(ladybug_query_result* query_result,
     ladybug_query_result* out_query_result) {
     if (!ladybug_query_result_has_next_query_result(query_result)) {
-        return KuzuError;
+        return LadybugError;
     }
     auto next_query_result =
         static_cast<QueryResult*>(query_result->_query_result)->getNextQueryResult();
     if (next_query_result == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
     out_query_result->_query_result = next_query_result;
     out_query_result->_is_owned_by_cpp = true;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_query_result_get_next(ladybug_query_result* query_result,
@@ -99,9 +99,9 @@ ladybug_state ladybug_query_result_get_next(ladybug_query_result* query_result,
         auto flat_tuple = static_cast<QueryResult*>(query_result->_query_result)->getNext();
         out_flat_tuple->_flat_tuple = flat_tuple.get();
         out_flat_tuple->_is_owned_by_cpp = true;
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -118,9 +118,9 @@ ladybug_state ladybug_query_result_get_arrow_schema(ladybug_query_result* query_
     ArrowSchema* out_schema) {
     try {
         *out_schema = *static_cast<QueryResult*>(query_result->_query_result)->getArrowSchema();
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -129,8 +129,8 @@ ladybug_state ladybug_query_result_get_next_arrow_chunk(ladybug_query_result* qu
     try {
         *out_arrow_array =
             *static_cast<QueryResult*>(query_result->_query_result)->getNextArrowChunk(chunk_size);
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }

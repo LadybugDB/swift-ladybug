@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 
-@testable import Kuzu
+@testable import Ladybug
 
 final class ValueTests: XCTestCase {
     private var db: Database!
@@ -359,7 +359,7 @@ final class ValueTests: XCTestCase {
         )
         XCTAssertTrue(result.hasNext())
         let tuple = try! result.getNext()!
-        let value = try tuple.getValue(0) as! KuzuNode
+        let value = try tuple.getValue(0) as! LadybugNode
         XCTAssertEqual(value.label, "person")
         XCTAssertEqual(value.properties["ID"] as! Int64, 0)
         XCTAssertEqual(value.properties["fName"] as! String, "Alice")
@@ -380,10 +380,10 @@ final class ValueTests: XCTestCase {
         XCTAssertTrue(result.hasNext())
         let tuple = try! result.getNext()!
         let map = try tuple.getAsDictionary()
-        let rel = map["r"] as! KuzuRelationship
-        let src = map["p"] as! KuzuNode
-        let dst = map["o"] as! KuzuNode
-        XCTAssertEqual(rel.id, KuzuInternalId(tableId: 7, offset: 1))
+        let rel = map["r"] as! LadybugRelationship
+        let src = map["p"] as! LadybugNode
+        let dst = map["o"] as! LadybugNode
+        XCTAssertEqual(rel.id, LadybugInternalId(tableId: 7, offset: 1))
         XCTAssertEqual(rel.label, "workAt")
         XCTAssertEqual(rel.sourceId, src.id)
         XCTAssertEqual(rel.targetId, dst.id)
@@ -396,7 +396,7 @@ final class ValueTests: XCTestCase {
         )
         XCTAssertTrue(result.hasNext())
         let tuple = try! result.getNext()!
-        let value = try tuple.getValue(0) as! KuzuRecursiveRelationship
+        let value = try tuple.getValue(0) as! LadybugRecursiveRelationship
         XCTAssertEqual(value.nodes.count, 0)
         XCTAssertEqual(value.relationships.count, 1)
         let rel = value.relationships[0]

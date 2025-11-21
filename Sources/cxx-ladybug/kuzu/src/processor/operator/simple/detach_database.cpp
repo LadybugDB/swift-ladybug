@@ -15,7 +15,7 @@ void DetachDatabase::executeInternal(ExecutionContext* context) {
     auto clientContext = context->clientContext;
     auto dbManager = clientContext->getDatabaseManager();
     if (dbManager->hasAttachedDatabase(dbName) &&
-        dbManager->getAttachedDatabase(dbName)->getDBType() == common::ATTACHED_KUZU_DB_TYPE) {
+        dbManager->getAttachedDatabase(dbName)->getDBType() == common::ATTACHED_LADYBUG_DB_TYPE) {
         clientContext->setDefaultDatabase(nullptr /* defaultDatabase */);
     }
     dbManager->detachDatabase(dbName);

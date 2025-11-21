@@ -23,9 +23,9 @@ struct StorageVersionInfo {
             {"0.0.3", 1}};
     }
 
-    static KUZU_API storage_version_t getStorageVersion();
+    static LADYBUG_API storage_version_t getStorageVersion();
 
-    static constexpr const char* MAGIC_BYTES = "KUZU";
+    static constexpr const char* MAGIC_BYTES = "LADYBUG";
 };
 
 } // namespace storage

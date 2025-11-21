@@ -70,15 +70,15 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
 
     /// Returns the next tuple in the result set.
     /// - Returns: The next tuple, or nil if there are no more tuples.
-    /// - Throws: `KuzuError.getFlatTupleFailed` if retrieving the next tuple fails.
+    /// - Throws: `LadybugError.getFlatTupleFailed` if retrieving the next tuple fails.
     public func getNext() throws -> FlatTuple? {
         if !self.hasNext() {
             return nil
         }
         var cFlatTuple: ladybug_flat_tuple = ladybug_flat_tuple()
         let state = ladybug_query_result_get_next(&cQueryResult, &cFlatTuple)
-        if state != KuzuSuccess {
-            throw KuzuError.getFlatTupleFailed(
+        if state != LadybugSuccess {
+            throw LadybugError.getFlatTupleFailed(
                 "Get next failed with error code: \(state)"
             )
         }
@@ -92,7 +92,7 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
 
     /// Returns the next query result when multiple query statements are executed.
     /// - Returns: The next query result, or nil if there are no more results.
-    /// - Throws: `KuzuError.getNextQueryResultFailed` if retrieving the next query result fails.
+    /// - Throws: `LadybugError.getNextQueryResultFailed` if retrieving the next query result fails.
     public func getNextQueryResult() throws -> QueryResult? {
         if !self.hasNextQueryResult() {
             return nil
@@ -102,8 +102,8 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
             &cQueryResult,
             &cNextQueryResult
         )
-        if state != KuzuSuccess {
-            throw KuzuError.getNextQueryResultFailed(
+        if state != LadybugSuccess {
+            throw LadybugError.getNextQueryResultFailed(
                 "Get next query result failed with error code: \(state)"
             )
         }

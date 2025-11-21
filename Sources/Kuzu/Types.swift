@@ -5,8 +5,8 @@
 //  Copyright © 2023 - 2025 Kùzu Inc.
 //  This code is licensed under MIT license (see LICENSE for details)
 
-/// Errors that can occur during Kuzu operations.
-public enum KuzuError: Error {
+/// Errors that can occur during Ladybug operations.
+public enum LadybugError: Error {
     /// Database initialization failed with the given error message.
     case databaseInitializationFailed(String)
     /// Connection initialization failed with the given error message.
@@ -40,63 +40,63 @@ public enum KuzuError: Error {
     }
 }
 
-/// Represents the internal ID of a node or relationship in Kuzu.
+/// Represents the internal ID of a node or relationship in Ladybug.
 /// It conforms to the Equatable protocol for easy comparison.
-public struct KuzuInternalId: Equatable {
+public struct LadybugInternalId: Equatable {
     /// The table ID of the node or relationship.
     public let tableId: UInt64
     /// The offset within the table.
     public let offset: UInt64
 
-    /// Compares two KuzuInternalId instances for equality.
+    /// Compares two LadybugInternalId instances for equality.
     /// - Parameters:
-    ///   - lhs: The first KuzuInternalId to compare.
-    ///   - rhs: The second KuzuInternalId to compare.
-    /// - Returns: True if the two KuzuInternalId instances are equal, false otherwise.
-    public static func == (lhs: KuzuInternalId, rhs: KuzuInternalId) -> Bool {
+    ///   - lhs: The first LadybugInternalId to compare.
+    ///   - rhs: The second LadybugInternalId to compare.
+    /// - Returns: True if the two LadybugInternalId instances are equal, false otherwise.
+    public static func == (lhs: LadybugInternalId, rhs: LadybugInternalId) -> Bool {
         return lhs.tableId == rhs.tableId && lhs.offset == rhs.offset
     }
 }
 
-/// Represents a node retrieved from Kuzu.
+/// Represents a node retrieved from Ladybug.
 /// A node has an ID, a label, and properties.
-public struct KuzuNode {
+public struct LadybugNode {
     /// The internal ID of the node.
-    public let id: KuzuInternalId
+    public let id: LadybugInternalId
     /// The label of the node.
     public let label: String
     /// The properties of the node, where keys are property names and values are property values.
     public let properties: [String: Any?]
 }
 
-/// Represents a relationship retrieved from Kuzu.
+/// Represents a relationship retrieved from Ladybug.
 /// A relationship has a source ID, a destination ID, a label, and properties.
-public struct KuzuRelationship {
+public struct LadybugRelationship {
     /// The internal ID of the relationship
-    public let id: KuzuInternalId
+    public let id: LadybugInternalId
     /// The internal ID of the source node.
-    public let sourceId: KuzuInternalId
+    public let sourceId: LadybugInternalId
     /// The internal ID of the target node.
-    public let targetId: KuzuInternalId
+    public let targetId: LadybugInternalId
     /// The label of the relationship.
     public let label: String
     /// The properties of the relationship, where keys are property names and values are property values.
     public let properties: [String: Any?]
 }
 
-/// Represents a recursive relationship retrieved from a path query in Kuzu.
+/// Represents a recursive relationship retrieved from a path query in Ladybug.
 /// A recursive relationship has a list of nodes and a list of relationships.
-public struct KuzuRecursiveRelationship {
+public struct LadybugRecursiveRelationship {
     /// The list of nodes in the recursive relationship.
-    public let nodes: [KuzuNode]
+    public let nodes: [LadybugNode]
     /// The list of relationships in the recursive relationship.
-    public let relationships: [KuzuRelationship]
+    public let relationships: [LadybugRelationship]
 }
 
-/// A wrapper for UInt32 values to be passed as parameters to Kuzu.
+/// A wrapper for UInt32 values to be passed as parameters to Ladybug.
 /// The native Swift type UInt32 cannot be distinguished from Int64 because
 /// the underlying NSNumber type is the same for both types (type 'q').
-public struct KuzuUInt32Wrapper: Codable {
+public struct LadybugUInt32Wrapper: Codable {
     public var value: UInt32
 
     public init(value: UInt32) {
@@ -104,10 +104,10 @@ public struct KuzuUInt32Wrapper: Codable {
     }
 }
 
-/// A wrapper for UInt16 values to be passed as parameters to Kuzu.
+/// A wrapper for UInt16 values to be passed as parameters to Ladybug.
 /// The native Swift type UInt16 cannot be distinguished from Int32 because
 /// the underlying NSNumber type is the same for both types (type 'i').
-public struct KuzuUInt16Wrapper: Codable {
+public struct LadybugUInt16Wrapper: Codable {
     public var value: UInt16
 
     public init(value: UInt16) {
@@ -115,10 +115,10 @@ public struct KuzuUInt16Wrapper: Codable {
     }
 }
 
-/// A wrapper for UInt8 values to be passed as parameters to Kuzu.
+/// A wrapper for UInt8 values to be passed as parameters to Ladybug.
 /// The native Swift type UInt8 cannot be distinguished from Int16 because
 /// the underlying NSNumber type is the same for both types (type 's').
-public struct KuzuUInt8Wrapper: Codable {
+public struct LadybugUInt8Wrapper: Codable {
     public var value: UInt8
 
     public init(value: UInt8) {
@@ -126,11 +126,11 @@ public struct KuzuUInt8Wrapper: Codable {
     }
 }
 
-/// A wrapper for UInt64 values to be passed as parameters to Kuzu.
+/// A wrapper for UInt64 values to be passed as parameters to Ladybug.
 /// Using this wrapper is optional on macOS/iOS, because CoreFoundation
 /// framework can automatically detect the type of the underlying NSNumber.
 /// However, it is required on Linux, because CoreFoundation is not available.
-public struct KuzuUInt64Wrapper: Codable {
+public struct LadybugUInt64Wrapper: Codable {
     public var value: UInt64
 
     public init(value: UInt64) {
@@ -138,11 +138,11 @@ public struct KuzuUInt64Wrapper: Codable {
     }
 }
 
-/// A wrapper for Int64 values to be passed as parameters to Kuzu.
+/// A wrapper for Int64 values to be passed as parameters to Ladybug.
 /// Using this wrapper is optional on macOS/iOS, because CoreFoundation
 /// framework can automatically detect the type of the underlying NSNumber.
 /// However, it is required on Linux, because CoreFoundation is not available.
-public struct KuzuInt64Wrapper: Codable {
+public struct LadybugInt64Wrapper: Codable {
     public var value: Int64
 
     public init(value: Int64) {
@@ -150,11 +150,11 @@ public struct KuzuInt64Wrapper: Codable {
     }
 }
 
-/// A wrapper for Int32 values to be passed as parameters to Kuzu.
+/// A wrapper for Int32 values to be passed as parameters to Ladybug.
 /// Using this wrapper is optional on macOS/iOS, because CoreFoundation
 /// framework can automatically detect the type of the underlying NSNumber.
 /// However, it is required on Linux, because CoreFoundation is not available.
-public struct KuzuInt32Wrapper: Codable {
+public struct LadybugInt32Wrapper: Codable {
     public var value: Int32
 
     public init(value: Int32) {
@@ -162,11 +162,11 @@ public struct KuzuInt32Wrapper: Codable {
     }
 }
 
-/// A wrapper for Int16 values to be passed as parameters to Kuzu.
+/// A wrapper for Int16 values to be passed as parameters to Ladybug.
 /// Using this wrapper is optional on macOS/iOS, because CoreFoundation
 /// framework can automatically detect the type of the underlying NSNumber.
 /// However, it is required on Linux, because CoreFoundation is not available.
-public struct KuzuInt16Wrapper: Codable {
+public struct LadybugInt16Wrapper: Codable {
     public var value: Int16
 
     public init(value: Int16) {
@@ -174,11 +174,11 @@ public struct KuzuInt16Wrapper: Codable {
     }
 }
 
-/// A wrapper for Int8 values to be passed as parameters to Kuzu.
+/// A wrapper for Int8 values to be passed as parameters to Ladybug.
 /// Using this wrapper is optional on macOS/iOS, because CoreFoundation
 /// framework can automatically detect the type of the underlying NSNumber.
 /// However, it is required on Linux, because CoreFoundation is not available.
-public struct KuzuInt8Wrapper: Codable {
+public struct LadybugInt8Wrapper: Codable {
     public var value: Int8
 
     public init(value: Int8) {
@@ -186,11 +186,11 @@ public struct KuzuInt8Wrapper: Codable {
     }
 }
 
-/// A wrapper for Float values to be passed as parameters to Kuzu.
+/// A wrapper for Float values to be passed as parameters to Ladybug.
 /// Using this wrapper is optional on macOS/iOS, because CoreFoundation
 /// framework can automatically detect the type of the underlying NSNumber.
 /// However, it is required on Linux, because CoreFoundation is not available.
-public struct KuzuFloatWrapper: Codable {
+public struct LadybugFloatWrapper: Codable {
     public var value: Float
 
     public init(value: Float) {
@@ -198,11 +198,11 @@ public struct KuzuFloatWrapper: Codable {
     }
 }
 
-/// A wrapper for Double values to be passed as parameters to Kuzu.
+/// A wrapper for Double values to be passed as parameters to Ladybug.
 /// Using this wrapper is optional on macOS/iOS, because CoreFoundation
 /// framework can automatically detect the type of the underlying NSNumber.
 /// However, it is required on Linux, because CoreFoundation is not available.
-public struct KuzuDoubleWrapper: Codable {
+public struct LadybugDoubleWrapper: Codable {
     public var value: Double
 
     public init(value: Double) {
@@ -210,11 +210,11 @@ public struct KuzuDoubleWrapper: Codable {
     }
 }
 
-/// A wrapper for Bool values to be passed as parameters to Kuzu.
+/// A wrapper for Bool values to be passed as parameters to Ladybug.
 /// Using this wrapper is optional on macOS/iOS, because CoreFoundation
 /// framework can automatically detect the type of the underlying NSNumber.
 /// However, it is required on Linux, because CoreFoundation is not available.
-public struct KuzuBoolWrapper: Codable {
+public struct LadybugBoolWrapper: Codable {
     public var value: Bool
 
     public init(value: Bool) {

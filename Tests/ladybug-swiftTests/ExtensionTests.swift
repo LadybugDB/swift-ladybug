@@ -7,7 +7,7 @@
 import Foundation
 import XCTest
 
-@testable import Kuzu
+@testable import Ladybug
 
 final class ExtensionTests: XCTestCase {
     func testGds() async throws {
@@ -26,8 +26,8 @@ final class ExtensionTests: XCTestCase {
             autoCheckpoint: true,
             checkpointThreshold: UInt64.max
         )
-        let db = try Kuzu.Database(":memory:", systemConfig)
-        let conn = try Kuzu.Connection(db)
+        let db = try Ladybug.Database(":memory:", systemConfig)
+        let conn = try Ladybug.Connection(db)
         _ = try conn.query(
             "CREATE NODE TABLE Node(id STRING PRIMARY KEY);"
         )

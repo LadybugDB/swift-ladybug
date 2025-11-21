@@ -14,15 +14,15 @@ using namespace ladybug::main;
 ladybug_state ladybug_connection_init(ladybug_database* database, ladybug_connection* out_connection) {
     if (database == nullptr || database->_database == nullptr) {
         out_connection->_connection = nullptr;
-        return KuzuError;
+        return LadybugError;
     }
     try {
         out_connection->_connection = new Connection(static_cast<Database*>(database->_database));
     } catch (Exception& e) {
         out_connection->_connection = nullptr;
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 void ladybug_connection_destroy(ladybug_connection* connection) {
@@ -37,70 +37,70 @@ void ladybug_connection_destroy(ladybug_connection* connection) {
 ladybug_state ladybug_connection_set_max_num_thread_for_exec(ladybug_connection* connection,
     uint64_t num_threads) {
     if (connection == nullptr || connection->_connection == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         static_cast<Connection*>(connection->_connection)->setMaxNumThreadForExec(num_threads);
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_connection_get_max_num_thread_for_exec(ladybug_connection* connection,
     uint64_t* out_result) {
     if (connection == nullptr || connection->_connection == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Connection*>(connection->_connection)->getMaxNumThreadForExec();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_connection_query(ladybug_connection* connection, const char* query,
     ladybug_query_result* out_query_result) {
     if (connection == nullptr || connection->_connection == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto query_result =
             static_cast<Connection*>(connection->_connection)->query(query).release();
         if (query_result == nullptr) {
-            return KuzuError;
+            return LadybugError;
         }
         out_query_result->_query_result = query_result;
         out_query_result->_is_owned_by_cpp = false;
         if (!query_result->isSuccess()) {
-            return KuzuError;
+            return LadybugError;
         }
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
 ladybug_state ladybug_connection_prepare(ladybug_connection* connection, const char* query,
     ladybug_prepared_statement* out_prepared_statement) {
     if (connection == nullptr || connection->_connection == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto prepared_statement =
             static_cast<Connection*>(connection->_connection)->prepare(query).release();
         if (prepared_statement == nullptr) {
-            return KuzuError;
+            return LadybugError;
         }
         out_prepared_statement->_prepared_statement = prepared_statement;
         out_prepared_statement->_bound_values =
             new std::unordered_map<std::string, std::unique_ptr<Value>>;
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_connection_execute(ladybug_connection* connection,
@@ -108,7 +108,7 @@ ladybug_state ladybug_connection_execute(ladybug_connection* connection,
     if (connection == nullptr || connection->_connection == nullptr ||
         prepared_statement == nullptr || prepared_statement->_prepared_statement == nullptr ||
         prepared_statement->_bound_values == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto prepared_statement_ptr =
@@ -128,16 +128,16 @@ ladybug_state ladybug_connection_execute(ladybug_connection* connection,
                 ->executeWithParams(prepared_statement_ptr, std::move(copied_bound_values))
                 .release();
         if (query_result == nullptr) {
-            return KuzuError;
+            return LadybugError;
         }
         out_query_result->_query_result = query_result;
         out_query_result->_is_owned_by_cpp = false;
         if (!query_result->isSuccess()) {
-            return KuzuError;
+            return LadybugError;
         }
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 void ladybug_connection_interrupt(ladybug_connection* connection) {
@@ -146,12 +146,12 @@ void ladybug_connection_interrupt(ladybug_connection* connection) {
 
 ladybug_state ladybug_connection_set_query_timeout(ladybug_connection* connection, uint64_t timeout_in_ms) {
     if (connection == nullptr || connection->_connection == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         static_cast<Connection*>(connection->_connection)->setQueryTimeOut(timeout_in_ms);
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }

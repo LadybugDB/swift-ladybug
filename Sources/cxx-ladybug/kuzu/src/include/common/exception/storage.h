@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API StorageException : public Exception {
+class LADYBUG_API StorageException : public Exception {
 public:
     explicit StorageException(const std::string& msg) : Exception("Storage exception: " + msg){};
 };

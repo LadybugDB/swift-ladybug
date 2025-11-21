@@ -8,15 +8,15 @@
 import Foundation
 @_implementationOnly import cxx_ladybug
 
-/// A class representing a Kuzu database instance.
+/// A class representing a Ladybug database instance.
 public final class Database: @unchecked Sendable {
     internal var cDatabase: ladybug_database
 
-    /// Initializes a new Kuzu database instance.
+    /// Initializes a new Ladybug database instance.
     /// - Parameters:
     ///   - databasePath: The path to the database. Defaults to ":memory:" for in-memory database.
     ///   - systemConfig: Optional configuration for the database system. If nil, default configuration will be used.
-    /// - Throws: `KuzuError.databaseInitializationFailed` if the database initialization fails.
+    /// - Throws: `LadybugError.databaseInitializationFailed` if the database initialization fails.
     public init(
         _ databasePath: String = ":memory:",
         _ systemConfig: SystemConfig? = nil
@@ -29,18 +29,18 @@ public final class Database: @unchecked Sendable {
             cSystemConfg,
             &self.cDatabase
         )
-        if state == KuzuSuccess {
+        if state == LadybugSuccess {
             return
         } else {
-            throw KuzuError.databaseInitializationFailed(
+            throw LadybugError.databaseInitializationFailed(
                 "Database initialization failed with error code: \(state)"
             )
         }
     }
 
-    /// The version of the Kuzu library as a string.
+    /// The version of the Ladybug library as a string.
     ///
-    /// This property returns the version of the underlying Kuzu library.
+    /// This property returns the version of the underlying Ladybug library.
     /// Useful for debugging and ensuring compatibility.
     public static var version: String {
         let resultCString = ladybug_get_version()
@@ -48,9 +48,9 @@ public final class Database: @unchecked Sendable {
         return String(cString: resultCString!)
     }
 
-    /// The storage version of the Kuzu library as an unsigned 64-bit integer.
+    /// The storage version of the Ladybug library as an unsigned 64-bit integer.
     ///
-    /// This property returns the storage format version used by the Kuzu library.
+    /// This property returns the storage format version used by the Ladybug library.
     /// It can be used to check compatibility of database files.
     public static var storageVersion: UInt64 {
         let storageVersion = ladybug_get_storage_version()

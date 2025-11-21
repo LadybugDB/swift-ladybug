@@ -178,7 +178,7 @@ ladybug_value* ladybug_value_create_string(const char* val_) {
 ladybug_state ladybug_value_create_list(uint64_t num_elements, ladybug_value** elements,
     ladybug_value** out_value) {
     if (num_elements == 0) {
-        return KuzuError;
+        return LadybugError;
     }
     auto* c_value = (ladybug_value*)calloc(1, sizeof(ladybug_value));
     std::vector<std::unique_ptr<Value>> children;
@@ -190,7 +190,7 @@ ladybug_state ladybug_value_create_list(uint64_t num_elements, ladybug_value** e
         auto child = static_cast<Value*>(elements[i]->_value);
         if (child->getDataType() != type) {
             free(c_value);
-            return KuzuError;
+            return LadybugError;
         }
         // Copy the value to the list value to transfer ownership to the C++ side.
         children.push_back(child->copy());
@@ -199,13 +199,13 @@ ladybug_state ladybug_value_create_list(uint64_t num_elements, ladybug_value** e
     c_value->_value = new Value(list_type.copy(), std::move(children));
     c_value->_is_owned_by_cpp = false;
     *out_value = c_value;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_create_struct(uint64_t num_fields, const char** field_names,
     ladybug_value** field_values, ladybug_value** out_value) {
     if (num_fields == 0) {
-        return KuzuError;
+        return LadybugError;
     }
     auto* c_value = (ladybug_value*)calloc(1, sizeof(ladybug_value));
     std::vector<std::unique_ptr<Value>> children;
@@ -221,13 +221,13 @@ ladybug_state ladybug_value_create_struct(uint64_t num_fields, const char** fiel
     c_value->_value = new Value(std::move(struct_type), std::move(children));
     c_value->_is_owned_by_cpp = false;
     *out_value = c_value;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_create_map(uint64_t num_fields, ladybug_value** keys, ladybug_value** values,
     ladybug_value** out_value) {
     if (num_fields == 0) {
-        return KuzuError;
+        return LadybugError;
     }
     auto* c_value = (ladybug_value*)calloc(1, sizeof(ladybug_value));
     std::vector<std::unique_ptr<Value>> children;
@@ -242,7 +242,7 @@ ladybug_state ladybug_value_create_map(uint64_t num_fields, ladybug_value** keys
         auto value = static_cast<Value*>(values[i]->_value);
         if (key->getDataType() != key_type || value->getDataType() != value_type) {
             free(c_value);
-            return KuzuError;
+            return LadybugError;
         }
         std::vector<StructField> struct_fields;
         struct_fields.emplace_back(InternalKeyword::MAP_KEY, key_type.copy());
@@ -258,7 +258,7 @@ ladybug_state ladybug_value_create_map(uint64_t num_fields, ladybug_value** keys
     c_value->_value = new Value(map_type.copy(), std::move(children));
     c_value->_is_owned_by_cpp = false;
     *out_value = c_value;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_value* ladybug_value_clone(ladybug_value* value) {
@@ -286,63 +286,63 @@ void ladybug_value_destroy(ladybug_value* value) {
 ladybug_state ladybug_value_get_list_size(ladybug_value* value, uint64_t* out_result) {
     if (static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID() !=
         LogicalTypeID::LIST) {
-        return KuzuError;
+        return LadybugError;
     }
     *out_result = NestedVal::getChildrenSize(static_cast<Value*>(value->_value));
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_list_element(ladybug_value* value, uint64_t index, ladybug_value* out_value) {
     auto physical_type_id = static_cast<Value*>(value->_value)->getDataType().getPhysicalType();
     if (physical_type_id != PhysicalTypeID::ARRAY && physical_type_id != PhysicalTypeID::STRUCT &&
         physical_type_id != PhysicalTypeID::LIST) {
-        return KuzuError;
+        return LadybugError;
     }
     auto listValue = static_cast<Value*>(value->_value);
     if (index >= NestedVal::getChildrenSize(listValue)) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto val = NestedVal::getChildVal(listValue, index);
         out_value->_value = val;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_struct_num_fields(ladybug_value* value, uint64_t* out_result) {
     auto physical_type_id = static_cast<Value*>(value->_value)->getDataType().getPhysicalType();
     if (physical_type_id != PhysicalTypeID::STRUCT) {
-        return KuzuError;
+        return LadybugError;
     }
     auto val = static_cast<Value*>(value->_value);
     const auto& data_type = val->getDataType();
     try {
         *out_result = StructType::getNumFields(data_type);
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
 ladybug_state ladybug_value_get_struct_field_name(ladybug_value* value, uint64_t index, char** out_result) {
     auto physical_type_id = static_cast<Value*>(value->_value)->getDataType().getPhysicalType();
     if (physical_type_id != PhysicalTypeID::STRUCT) {
-        return KuzuError;
+        return LadybugError;
     }
     auto val = static_cast<Value*>(value->_value);
     const auto& data_type = val->getDataType();
     if (index >= StructType::getNumFields(data_type)) {
-        return KuzuError;
+        return LadybugError;
     }
     std::string struct_field_name = StructType::getFields(data_type)[index].getName();
     if (struct_field_name.empty()) {
-        return KuzuError;
+        return LadybugError;
     }
     *out_result = convertToOwnedCString(struct_field_name);
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_struct_field_value(ladybug_value* value, uint64_t index,
@@ -353,25 +353,25 @@ ladybug_state ladybug_value_get_struct_field_value(ladybug_value* value, uint64_
 ladybug_state ladybug_value_get_map_size(ladybug_value* value, uint64_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::MAP) {
-        return KuzuError;
+        return LadybugError;
     }
     auto listValue = static_cast<Value*>(value->_value);
     *out_result = NestedVal::getChildrenSize(listValue);
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_map_key(ladybug_value* value, uint64_t index, ladybug_value* out_key) {
     ladybug_value map_entry;
-    if (ladybug_value_get_list_element(value, index, &map_entry) == KuzuError) {
-        return KuzuError;
+    if (ladybug_value_get_list_element(value, index, &map_entry) == LadybugError) {
+        return LadybugError;
     }
     return ladybug_value_get_struct_field_value(&map_entry, 0, out_key);
 }
 
 ladybug_state ladybug_value_get_map_value(ladybug_value* value, uint64_t index, ladybug_value* out_value) {
     ladybug_value map_entry;
-    if (ladybug_value_get_list_element(value, index, &map_entry) == KuzuError) {
-        return KuzuError;
+    if (ladybug_value_get_list_element(value, index, &map_entry) == LadybugError) {
+        return LadybugError;
     }
     return ladybug_value_get_struct_field_value(&map_entry, 1, out_value);
 }
@@ -379,29 +379,29 @@ ladybug_state ladybug_value_get_map_value(ladybug_value* value, uint64_t index, 
 ladybug_state ladybug_value_get_recursive_rel_node_list(ladybug_value* value, ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::RECURSIVE_REL) {
-        return KuzuError;
+        return LadybugError;
     }
     out_value->_is_owned_by_cpp = true;
     try {
         out_value->_value = RecursiveRelVal::getNodes(static_cast<Value*>(value->_value));
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_recursive_rel_rel_list(ladybug_value* value, ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::RECURSIVE_REL) {
-        return KuzuError;
+        return LadybugError;
     }
     out_value->_is_owned_by_cpp = true;
     try {
         out_value->_value = RecursiveRelVal::getRels(static_cast<Value*>(value->_value));
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 void ladybug_value_get_data_type(ladybug_value* value, ladybug_logical_type* out_data_type) {
@@ -412,133 +412,133 @@ void ladybug_value_get_data_type(ladybug_value* value, ladybug_logical_type* out
 ladybug_state ladybug_value_get_bool(ladybug_value* value, bool* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::BOOL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<bool>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_int8(ladybug_value* value, int8_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::INT8) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<int8_t>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_int16(ladybug_value* value, int16_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::INT16) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<int16_t>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_int32(ladybug_value* value, int32_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::INT32) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<int32_t>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_int64(ladybug_value* value, int64_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::INT64) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<int64_t>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_uint8(ladybug_value* value, uint8_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::UINT8) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<uint8_t>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_uint16(ladybug_value* value, uint16_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::UINT16) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<uint16_t>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_uint32(ladybug_value* value, uint32_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::UINT32) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<uint32_t>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_uint64(ladybug_value* value, uint64_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::UINT64) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<uint64_t>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_int128(ladybug_value* value, ladybug_int128_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::INT128) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto int128_val = static_cast<Value*>(value->_value)->getValue<int128_t>();
         out_result->low = int128_val.low;
         out_result->high = int128_val.high;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_int128_t_from_string(const char* str, ladybug_int128_t* out_result) {
@@ -548,9 +548,9 @@ ladybug_state ladybug_int128_t_from_string(const char* str, ladybug_int128_t* ou
         out_result->low = int128_val.low;
         out_result->high = int128_val.high;
     } catch (ConversionException& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_int128_t_to_string(ladybug_int128_t int128_val, char** out_result) {
@@ -560,152 +560,152 @@ ladybug_state ladybug_int128_t_to_string(ladybug_int128_t int128_val, char** out
     try {
         *out_result = convertToOwnedCString(TypeUtils::toString(c_int128));
     } catch (ConversionException& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 // TODO: bind all int128_t supported functions
 
 ladybug_state ladybug_value_get_float(ladybug_value* value, float* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::FLOAT) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<float>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_double(ladybug_value* value, double* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::DOUBLE) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = static_cast<Value*>(value->_value)->getValue<double>();
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_internal_id(ladybug_value* value, ladybug_internal_id_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::INTERNAL_ID) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto id = static_cast<Value*>(value->_value)->getValue<internalID_t>();
         out_result->offset = id.offset;
         out_result->table_id = id.tableID;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_date(ladybug_value* value, ladybug_date_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::DATE) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto date_val = static_cast<Value*>(value->_value)->getValue<date_t>();
         out_result->days = date_val.days;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_timestamp(ladybug_value* value, ladybug_timestamp_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::TIMESTAMP) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto timestamp_val = static_cast<Value*>(value->_value)->getValue<timestamp_t>();
         out_result->value = timestamp_val.value;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_timestamp_ns(ladybug_value* value, ladybug_timestamp_ns_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::TIMESTAMP_NS) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto timestamp_val = static_cast<Value*>(value->_value)->getValue<timestamp_ns_t>();
         out_result->value = timestamp_val.value;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_timestamp_ms(ladybug_value* value, ladybug_timestamp_ms_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::TIMESTAMP_MS) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto timestamp_val = static_cast<Value*>(value->_value)->getValue<timestamp_ms_t>();
         out_result->value = timestamp_val.value;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_timestamp_sec(ladybug_value* value, ladybug_timestamp_sec_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::TIMESTAMP_SEC) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto timestamp_val = static_cast<Value*>(value->_value)->getValue<timestamp_sec_t>();
         out_result->value = timestamp_val.value;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_timestamp_tz(ladybug_value* value, ladybug_timestamp_tz_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::TIMESTAMP_TZ) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto timestamp_val = static_cast<Value*>(value->_value)->getValue<timestamp_tz_t>();
         out_result->value = timestamp_val.value;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_decimal_as_string(ladybug_value* value, char** out_result) {
     auto decimal_val = static_cast<Value*>(value->_value);
     auto logical_type_id = decimal_val->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::DECIMAL) {
-        return KuzuError;
+        return LadybugError;
     }
 
     *out_result = convertToOwnedCString(decimal_val->toString());
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_interval(ladybug_value* value, ladybug_interval_t* out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::INTERVAL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto interval_val = static_cast<Value*>(value->_value)->getValue<interval_t>();
@@ -713,51 +713,51 @@ ladybug_state ladybug_value_get_interval(ladybug_value* value, ladybug_interval_
         out_result->days = interval_val.days;
         out_result->micros = interval_val.micros;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_string(ladybug_value* value, char** out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::STRING) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result =
             convertToOwnedCString(static_cast<Value*>(value->_value)->getValue<std::string>());
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_blob(ladybug_value* value, uint8_t** out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::BLOB) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto blob = static_cast<Value*>(value->_value)->getValue<std::string>();
         *out_result = (uint8_t*)convertToOwnedCString(blob);
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_value_get_uuid(ladybug_value* value, char** out_result) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::UUID) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result =
             convertToOwnedCString(static_cast<Value*>(value->_value)->getValue<std::string>());
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 char* ladybug_value_to_string(ladybug_value* value) {
@@ -767,213 +767,213 @@ char* ladybug_value_to_string(ladybug_value* value) {
 ladybug_state ladybug_node_val_get_id_val(ladybug_value* node_val, ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(node_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::NODE) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto id_val = NodeVal::getNodeIDVal(static_cast<Value*>(node_val->_value));
         out_value->_value = id_val;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_node_val_get_label_val(ladybug_value* node_val, ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(node_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::NODE) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto label_val = NodeVal::getLabelVal(static_cast<Value*>(node_val->_value));
         out_value->_value = label_val;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_node_val_get_property_size(ladybug_value* node_val, uint64_t* out_result) {
     auto logical_type_id = static_cast<Value*>(node_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::NODE) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = NodeVal::getNumProperties(static_cast<Value*>(node_val->_value));
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_node_val_get_property_name_at(ladybug_value* node_val, uint64_t index,
     char** out_result) {
     auto logical_type_id = static_cast<Value*>(node_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::NODE) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         std::string property_name =
             NodeVal::getPropertyName(static_cast<Value*>(node_val->_value), index);
         if (property_name.empty()) {
-            return KuzuError;
+            return LadybugError;
         }
         *out_result = convertToOwnedCString(property_name);
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_node_val_get_property_value_at(ladybug_value* node_val, uint64_t index,
     ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(node_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::NODE) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto value = NodeVal::getPropertyVal(static_cast<Value*>(node_val->_value), index);
         out_value->_value = value;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_node_val_to_string(ladybug_value* node_val, char** out_result) {
     auto logical_type_id = static_cast<Value*>(node_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::NODE) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result =
             convertToOwnedCString(NodeVal::toString(static_cast<Value*>(node_val->_value)));
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_rel_val_get_id_val(ladybug_value* rel_val, ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(rel_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::REL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto id_val = RelVal::getIDVal(static_cast<Value*>(rel_val->_value));
         out_value->_value = id_val;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_rel_val_get_src_id_val(ladybug_value* rel_val, ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(rel_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::REL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto src_id_val = RelVal::getSrcNodeIDVal(static_cast<Value*>(rel_val->_value));
         out_value->_value = src_id_val;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_rel_val_get_dst_id_val(ladybug_value* rel_val, ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(rel_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::REL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto dst_id_val = RelVal::getDstNodeIDVal(static_cast<Value*>(rel_val->_value));
         out_value->_value = dst_id_val;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_rel_val_get_label_val(ladybug_value* rel_val, ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(rel_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::REL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto label_val = RelVal::getLabelVal(static_cast<Value*>(rel_val->_value));
         out_value->_value = label_val;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_rel_val_get_property_size(ladybug_value* rel_val, uint64_t* out_result) {
     auto logical_type_id = static_cast<Value*>(rel_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::REL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = RelVal::getNumProperties(static_cast<Value*>(rel_val->_value));
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 ladybug_state ladybug_rel_val_get_property_name_at(ladybug_value* rel_val, uint64_t index,
     char** out_result) {
     auto logical_type_id = static_cast<Value*>(rel_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::REL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         std::string property_name =
             RelVal::getPropertyName(static_cast<Value*>(rel_val->_value), index);
         if (property_name.empty()) {
-            return KuzuError;
+            return LadybugError;
         }
         *out_result = convertToOwnedCString(property_name);
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_rel_val_get_property_value_at(ladybug_value* rel_val, uint64_t index,
     ladybug_value* out_value) {
     auto logical_type_id = static_cast<Value*>(rel_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::REL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         auto value = RelVal::getPropertyVal(static_cast<Value*>(rel_val->_value), index);
         out_value->_value = value;
         out_value->_is_owned_by_cpp = true;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_rel_val_to_string(ladybug_value* rel_val, char** out_result) {
     auto logical_type_id = static_cast<Value*>(rel_val->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::REL) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = convertToOwnedCString(RelVal::toString(static_cast<Value*>(rel_val->_value)));
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 void ladybug_destroy_string(char* str) {
@@ -988,70 +988,70 @@ ladybug_state ladybug_timestamp_ns_to_tm(ladybug_timestamp_ns_t timestamp, struc
     time_t time = timestamp.value / 1000000000;
 #ifdef _WIN32
     if (convertTimeToTm(time, out_result) != 0) {
-        return KuzuError;
+        return LadybugError;
     }
 #else
     if (gmtime_r(&time, out_result) == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
 #endif
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_ms_to_tm(ladybug_timestamp_ms_t timestamp, struct tm* out_result) {
     time_t time = timestamp.value / 1000;
 #ifdef _WIN32
     if (convertTimeToTm(time, out_result) != 0) {
-        return KuzuError;
+        return LadybugError;
     }
 #else
     if (gmtime_r(&time, out_result) == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
 #endif
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_sec_to_tm(ladybug_timestamp_sec_t timestamp, struct tm* out_result) {
     time_t time = timestamp.value;
 #ifdef _WIN32
     if (convertTimeToTm(time, out_result) != 0) {
-        return KuzuError;
+        return LadybugError;
     }
 #else
     if (gmtime_r(&time, out_result) == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
 #endif
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_tz_to_tm(ladybug_timestamp_tz_t timestamp, struct tm* out_result) {
     time_t time = timestamp.value / 1000000;
 #ifdef _WIN32
     if (convertTimeToTm(time, out_result) != 0) {
-        return KuzuError;
+        return LadybugError;
     }
 #else
     if (gmtime_r(&time, out_result) == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
 #endif
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_to_tm(ladybug_timestamp_t timestamp, struct tm* out_result) {
     time_t time = timestamp.value / 1000000;
 #ifdef _WIN32
     if (convertTimeToTm(time, out_result) != 0) {
-        return KuzuError;
+        return LadybugError;
     }
 #else
     if (gmtime_r(&time, out_result) == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
 #endif
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_ns_from_tm(struct tm tm, ladybug_timestamp_ns_t* out_result) {
@@ -1061,10 +1061,10 @@ ladybug_state ladybug_timestamp_ns_from_tm(struct tm tm, ladybug_timestamp_ns_t*
     int64_t time = timegm(&tm);
 #endif
     if (time == -1) {
-        return KuzuError;
+        return LadybugError;
     }
     out_result->value = time * 1000000000;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_ms_from_tm(struct tm tm, ladybug_timestamp_ms_t* out_result) {
@@ -1074,10 +1074,10 @@ ladybug_state ladybug_timestamp_ms_from_tm(struct tm tm, ladybug_timestamp_ms_t*
     int64_t time = timegm(&tm);
 #endif
     if (time == -1) {
-        return KuzuError;
+        return LadybugError;
     }
     out_result->value = time * 1000;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_sec_from_tm(struct tm tm, ladybug_timestamp_sec_t* out_result) {
@@ -1087,10 +1087,10 @@ ladybug_state ladybug_timestamp_sec_from_tm(struct tm tm, ladybug_timestamp_sec_
     int64_t time = timegm(&tm);
 #endif
     if (time == -1) {
-        return KuzuError;
+        return LadybugError;
     }
     out_result->value = time;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_tz_from_tm(struct tm tm, ladybug_timestamp_tz_t* out_result) {
@@ -1100,10 +1100,10 @@ ladybug_state ladybug_timestamp_tz_from_tm(struct tm tm, ladybug_timestamp_tz_t*
     int64_t time = timegm(&tm);
 #endif
     if (time == -1) {
-        return KuzuError;
+        return LadybugError;
     }
     out_result->value = time * 1000000;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_timestamp_from_tm(struct tm tm, ladybug_timestamp_t* out_result) {
@@ -1113,27 +1113,27 @@ ladybug_state ladybug_timestamp_from_tm(struct tm tm, ladybug_timestamp_t* out_r
     int64_t time = timegm(&tm);
 #endif
     if (time == -1) {
-        return KuzuError;
+        return LadybugError;
     }
     out_result->value = time * 1000000;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_date_to_tm(ladybug_date_t date, struct tm* out_result) {
     time_t time = date.days * 86400;
 #ifdef _WIN32
     if (convertTimeToTm(time, out_result) != 0) {
-        return KuzuError;
+        return LadybugError;
     }
 #else
     if (gmtime_r(&time, out_result) == nullptr) {
-        return KuzuError;
+        return LadybugError;
     }
 #endif
     out_result->tm_hour = 0;
     out_result->tm_min = 0;
     out_result->tm_sec = 0;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_date_from_tm(struct tm tm, ladybug_date_t* out_result) {
@@ -1143,23 +1143,23 @@ ladybug_state ladybug_date_from_tm(struct tm tm, ladybug_date_t* out_result) {
     int64_t time = timegm(&tm);
 #endif
     if (time == -1) {
-        return KuzuError;
+        return LadybugError;
     }
     out_result->days = time / 86400;
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_date_to_string(ladybug_date_t date, char** out_result) {
     tm tm{};
-    if (ladybug_date_to_tm(date, &tm) != KuzuSuccess) {
-        return KuzuError;
+    if (ladybug_date_to_tm(date, &tm) != LadybugSuccess) {
+        return LadybugError;
     }
     char buffer[80];
     if (strftime(buffer, 80, "%Y-%m-%d", &tm) == 0) {
-        return KuzuError;
+        return LadybugError;
     }
     *out_result = convertToOwnedCString(buffer);
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 ladybug_state ladybug_date_from_string(const char* str, ladybug_date_t* out_result) {
@@ -1167,9 +1167,9 @@ ladybug_state ladybug_date_from_string(const char* str, ladybug_date_t* out_resu
         date_t date = Date::fromCString(str, strlen(str));
         out_result->days = date.days;
     } catch (ConversionException& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 void ladybug_interval_to_difftime(ladybug_interval_t interval, double* out_result) {

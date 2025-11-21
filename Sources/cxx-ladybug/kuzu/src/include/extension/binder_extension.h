@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace extension {
 
-class KUZU_API BinderExtension {
+class LADYBUG_API BinderExtension {
 public:
     BinderExtension() {}
 

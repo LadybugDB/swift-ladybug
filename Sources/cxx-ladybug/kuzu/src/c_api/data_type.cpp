@@ -59,12 +59,12 @@ ladybug_state ladybug_data_type_get_num_elements_in_array(ladybug_logical_type* 
     uint64_t* out_result) {
     auto parent_type = static_cast<LogicalType*>(data_type->_data_type);
     if (parent_type->getLogicalTypeID() != LogicalTypeID::ARRAY) {
-        return KuzuError;
+        return LadybugError;
     }
     try {
         *out_result = ArrayType::getNumElements(*parent_type);
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }

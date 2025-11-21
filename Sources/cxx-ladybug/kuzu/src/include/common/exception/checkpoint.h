@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API CheckpointException : public Exception {
+class LADYBUG_API CheckpointException : public Exception {
 public:
     explicit CheckpointException(const std::exception& e) : Exception(e.what()){};
 };

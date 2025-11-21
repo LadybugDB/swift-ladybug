@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 
-@testable import Kuzu
+@testable import Ladybug
 
 final class ConnectionTests: XCTestCase {
     var db: Database!
@@ -51,7 +51,7 @@ final class ConnectionTests: XCTestCase {
                 do {
                     _ = try conn.query(largeQuery)
                     XCTFail("Expected query to be interrupted")
-                } catch let error as KuzuError {
+                } catch let error as LadybugError {
                     XCTAssertEqual(error.message, "Interrupted.")
                 } catch {
                     XCTFail("Query failed, but not due to interruption")
@@ -76,7 +76,7 @@ final class ConnectionTests: XCTestCase {
                 "UNWIND RANGE(1,100000) AS x UNWIND RANGE(1, 100000) AS y RETURN COUNT(x + y);"
             )
             XCTFail("Expected timeout error")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertEqual(error.message, "Interrupted.")
         } catch {
             XCTFail("Query failed, but not due to interruption")
@@ -98,7 +98,7 @@ final class ConnectionTests: XCTestCase {
         do {
             _ = try conn.query("RETURN a;")
             XCTFail("Expected error")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("Variable a is not in scope."))
         } catch {
             XCTFail("Unexpected error type")
@@ -115,7 +115,7 @@ final class ConnectionTests: XCTestCase {
         do {
             _ = try conn.prepare("MATCH RETURN $a;")
             XCTFail("Expected error")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("Parser exception"))
         } catch {
             XCTFail("Unexpected error type")
@@ -128,7 +128,7 @@ final class ConnectionTests: XCTestCase {
         #if os(Linux)
             let result = try conn.execute(
                 stmt,
-                ["a": KuzuInt64Wrapper(value: 1)]
+                ["a": LadybugInt64Wrapper(value: 1)]
             )
         #else
             let result = try conn.execute(stmt, ["a": Int64(1)])
@@ -146,12 +146,12 @@ final class ConnectionTests: XCTestCase {
 
         do {
             #if os(Linux)
-                _ = try conn.execute(stmt, ["b": KuzuInt64Wrapper(value: 1)])
+                _ = try conn.execute(stmt, ["b": LadybugInt64Wrapper(value: 1)])
             #else
                 _ = try conn.execute(stmt, ["b": Int64(1)])
             #endif
             XCTFail("Expected error")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("Parameter b not found"))
         } catch {
             XCTFail("Unexpected error type")

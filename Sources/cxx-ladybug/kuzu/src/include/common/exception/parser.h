@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API ParserException : public Exception {
+class LADYBUG_API ParserException : public Exception {
 public:
     static constexpr const char* ERROR_PREFIX = "Parser exception: ";
 

@@ -11,7 +11,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API StringUtils {
+class LADYBUG_API StringUtils {
 public:
     static std::vector<std::string> splitComma(const std::string& input);
 

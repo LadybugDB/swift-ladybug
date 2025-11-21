@@ -32,7 +32,7 @@ ParquetWriter::ParquetWriter(std::string fileName, std::vector<common::LogicalTy
     fileMetaData.version = 1;
 
     fileMetaData.__isset.created_by = true;
-    fileMetaData.created_by = "KUZU";
+    fileMetaData.created_by = "LADYBUG";
 
     fileMetaData.schema.resize(1);
 

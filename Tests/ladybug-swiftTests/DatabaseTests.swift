@@ -7,7 +7,7 @@
 import Foundation
 import XCTest
 
-@testable import Kuzu
+@testable import Ladybug
 
 final class DatabaseTests: XCTestCase {
     func testOpenDatabaseWithDefaultConfig() throws {

@@ -1,4 +1,4 @@
-import Kuzu
+import Ladybug
 
 let db = try! Database()
 let conn = try! Connection(db)

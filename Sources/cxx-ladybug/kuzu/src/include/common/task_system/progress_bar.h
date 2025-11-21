@@ -31,7 +31,7 @@ public:
 
     void toggleProgressBarPrinting(bool enable);
 
-    KUZU_API void updateProgress(uint64_t queryID, double curPipelineProgress);
+    LADYBUG_API void updateProgress(uint64_t queryID, double curPipelineProgress);
 
     void setDisplay(std::shared_ptr<ProgressBarDisplay> progressBarDipslay);
 

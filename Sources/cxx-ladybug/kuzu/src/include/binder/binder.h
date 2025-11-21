@@ -73,7 +73,7 @@ public:
         : lastExpressionId{0}, scope{}, expressionBinder{this, clientContext},
           clientContext{clientContext}, binderExtensions{std::move(binderExtensions)} {}
 
-    KUZU_API std::unique_ptr<BoundStatement> bind(const parser::Statement& statement);
+    LADYBUG_API std::unique_ptr<BoundStatement> bind(const parser::Statement& statement);
 
     void setInputParameters(
         std::unordered_map<std::string, std::shared_ptr<common::Value>> parameters) {
@@ -84,13 +84,13 @@ public:
         return expressionBinder.parameterMap;
     }
 
-    KUZU_API std::shared_ptr<Expression> createVariable(const std::string& name,
+    LADYBUG_API std::shared_ptr<Expression> createVariable(const std::string& name,
         const common::LogicalType& dataType);
-    KUZU_API std::shared_ptr<Expression> createInvisibleVariable(const std::string& name,
+    LADYBUG_API std::shared_ptr<Expression> createInvisibleVariable(const std::string& name,
         const common::LogicalType& dataType) const;
-    KUZU_API expression_vector createVariables(const std::vector<std::string>& names,
+    LADYBUG_API expression_vector createVariables(const std::vector<std::string>& names,
         const std::vector<common::LogicalType>& types);
-    KUZU_API expression_vector createInvisibleVariables(const std::vector<std::string>& names,
+    LADYBUG_API expression_vector createInvisibleVariables(const std::vector<std::string>& names,
         const std::vector<common::LogicalType>& types) const;
 
     std::shared_ptr<Expression> bindWhereExpression(
@@ -293,7 +293,7 @@ public:
     std::shared_ptr<NodeExpression> bindQueryNode(const parser::NodePattern& nodePattern,
         QueryGraph& queryGraph);
     std::shared_ptr<NodeExpression> createQueryNode(const parser::NodePattern& nodePattern);
-    KUZU_API std::shared_ptr<NodeExpression> createQueryNode(const std::string& parsedName,
+    LADYBUG_API std::shared_ptr<NodeExpression> createQueryNode(const std::string& parsedName,
         const std::vector<catalog::TableCatalogEntry*>& entries);
 
     /*** bind table entries ***/
@@ -305,10 +305,10 @@ public:
     std::vector<PropertyDefinition> bindRelPropertyDefinitions(const parser::CreateTableInfo& info);
 
     /*** validations ***/
-    KUZU_API static void validateTableExistence(const main::ClientContext& context,
+    LADYBUG_API static void validateTableExistence(const main::ClientContext& context,
         const std::string& tableName);
-    KUZU_API static void validateNodeTableType(const catalog::TableCatalogEntry* entry);
-    KUZU_API static void validateColumnExistence(const catalog::TableCatalogEntry* entry,
+    LADYBUG_API static void validateNodeTableType(const catalog::TableCatalogEntry* entry);
+    LADYBUG_API static void validateColumnExistence(const catalog::TableCatalogEntry* entry,
         const std::string& columnName);
 
     void validateAllInputParametersParsed() const;
@@ -319,7 +319,7 @@ public:
     static bool reservedInPropertyLookup(const std::string& name);
 
     void addToScope(const std::vector<std::string>& names, const expression_vector& exprs);
-    KUZU_API void addToScope(const std::string& name, std::shared_ptr<Expression> expr);
+    LADYBUG_API void addToScope(const std::string& name, std::shared_ptr<Expression> expr);
     BinderScope saveScope() const;
     void restoreScope(BinderScope prevScope);
     void replaceExpressionInScope(const std::string& oldName, const std::string& newName,

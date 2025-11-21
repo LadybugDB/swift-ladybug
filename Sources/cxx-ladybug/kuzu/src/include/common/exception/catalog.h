@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API CatalogException : public Exception {
+class LADYBUG_API CatalogException : public Exception {
 public:
     explicit CatalogException(const std::string& msg) : Exception("Catalog exception: " + msg){};
 };

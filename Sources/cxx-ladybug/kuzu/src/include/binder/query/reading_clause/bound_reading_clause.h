@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace binder {
 
-class KUZU_API BoundReadingClause {
+class LADYBUG_API BoundReadingClause {
 public:
     explicit BoundReadingClause(common::ClauseType clauseType) : clauseType{clauseType} {}
     DELETE_COPY_DEFAULT_MOVE(BoundReadingClause);

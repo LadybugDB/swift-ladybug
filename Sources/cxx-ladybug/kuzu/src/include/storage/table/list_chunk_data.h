@@ -8,7 +8,7 @@ namespace ladybug {
 namespace storage {
 class MemoryManager;
 
-class KUZU_API ListChunkData final : public ColumnChunkData {
+class LADYBUG_API ListChunkData final : public ColumnChunkData {
 public:
     static constexpr common::idx_t SIZE_COLUMN_CHILD_READ_STATE_IDX = 0;
     static constexpr common::idx_t DATA_COLUMN_CHILD_READ_STATE_IDX = 1;

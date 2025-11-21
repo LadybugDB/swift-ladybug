@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 
-@testable import Kuzu
+@testable import Ladybug
 
 final class FlatTupleTests: XCTestCase {
     private var db: Database!

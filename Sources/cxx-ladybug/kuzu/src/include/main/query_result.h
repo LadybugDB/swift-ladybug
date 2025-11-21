@@ -44,54 +44,54 @@ public:
     /**
      * @brief Used to create a QueryResult object for the failing query.
      */
-    KUZU_API QueryResult();
+    LADYBUG_API QueryResult();
 
     explicit QueryResult(const PreparedSummary& preparedSummary);
     /**
      * @brief Deconstructs the QueryResult object.
      */
-    KUZU_API ~QueryResult();
+    LADYBUG_API ~QueryResult();
     /**
      * @return query is executed successfully or not.
      */
-    KUZU_API bool isSuccess() const;
+    LADYBUG_API bool isSuccess() const;
     /**
      * @return error message of the query execution if the query fails.
      */
-    KUZU_API std::string getErrorMessage() const;
+    LADYBUG_API std::string getErrorMessage() const;
     /**
      * @return number of columns in query result.
      */
-    KUZU_API size_t getNumColumns() const;
+    LADYBUG_API size_t getNumColumns() const;
     /**
      * @return name of each column in query result.
      */
-    KUZU_API std::vector<std::string> getColumnNames() const;
+    LADYBUG_API std::vector<std::string> getColumnNames() const;
     /**
      * @return dataType of each column in query result.
      */
-    KUZU_API std::vector<common::LogicalType> getColumnDataTypes() const;
+    LADYBUG_API std::vector<common::LogicalType> getColumnDataTypes() const;
     /**
      * @return num of tuples in query result.
      */
-    KUZU_API uint64_t getNumTuples() const;
+    LADYBUG_API uint64_t getNumTuples() const;
     /**
      * @return query summary which stores the execution time, compiling time, plan and query
      * options.
      */
-    KUZU_API QuerySummary* getQuerySummary() const;
+    LADYBUG_API QuerySummary* getQuerySummary() const;
     /**
      * @return whether there are more tuples to read.
      */
-    KUZU_API bool hasNext() const;
+    LADYBUG_API bool hasNext() const;
     /**
      * @return whether there are more query results to read.
      */
-    KUZU_API bool hasNextQueryResult() const;
+    LADYBUG_API bool hasNextQueryResult() const;
     /**
      * @return get next query result to read (for multiple query statements).
      */
-    KUZU_API QueryResult* getNextQueryResult();
+    LADYBUG_API QueryResult* getNextQueryResult();
 
     std::unique_ptr<QueryResult> nextQueryResult;
     /**
@@ -100,16 +100,16 @@ public:
      * please complete processing a FlatTuple or make a copy of its data before calling getNext()
      * again.
      */
-    KUZU_API std::shared_ptr<processor::FlatTuple> getNext();
+    LADYBUG_API std::shared_ptr<processor::FlatTuple> getNext();
     /**
      * @return string of first query result.
      */
-    KUZU_API std::string toString() const;
+    LADYBUG_API std::string toString() const;
 
     /**
      * @brief Resets the result tuple iterator.
      */
-    KUZU_API void resetIterator();
+    LADYBUG_API void resetIterator();
 
     /**
      * @brief Returns the arrow schema of the query result.
@@ -118,7 +118,7 @@ public:
      * It is the caller's responsibility to call the release function to release the underlying data
      * If converting to another arrow type, this this is usually handled automatically.
      */
-    KUZU_API std::unique_ptr<ArrowSchema> getArrowSchema() const;
+    LADYBUG_API std::unique_ptr<ArrowSchema> getArrowSchema() const;
 
     /**
      * @brief Returns the next chunk of the query result as an arrow array.
@@ -131,7 +131,7 @@ public:
      * It is the caller's responsibility to call the release function to release the underlying data
      * If converting to another arrow type, this this is usually handled automatically.
      */
-    KUZU_API std::unique_ptr<ArrowArray> getNextArrowChunk(int64_t chunkSize);
+    LADYBUG_API std::unique_ptr<ArrowArray> getNextArrowChunk(int64_t chunkSize);
 
     processor::FactorizedTable* getTable() { return factorizedTable.get(); }
 

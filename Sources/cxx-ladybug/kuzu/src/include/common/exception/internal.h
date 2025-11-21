@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API InternalException : public Exception {
+class LADYBUG_API InternalException : public Exception {
 public:
     explicit InternalException(const std::string& msg) : Exception(msg){};
 };

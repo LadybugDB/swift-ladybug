@@ -30,9 +30,9 @@ void AttachDatabase::executeInternal(ExecutionContext* context) {
     auto client = context->clientContext;
     auto databaseManager = client->getDatabaseManager();
     auto memoryManager = client->getMemoryManager();
-    if (common::StringUtils::getUpper(attachInfo.dbType) == common::ATTACHED_KUZU_DB_TYPE) {
-        auto db = std::make_unique<main::AttachedKuzuDatabase>(attachInfo.dbPath,
-            attachInfo.dbAlias, common::ATTACHED_KUZU_DB_TYPE, client);
+    if (common::StringUtils::getUpper(attachInfo.dbType) == common::ATTACHED_LADYBUG_DB_TYPE) {
+        auto db = std::make_unique<main::AttachedLadybugDatabase>(attachInfo.dbPath,
+            attachInfo.dbAlias, common::ATTACHED_LADYBUG_DB_TYPE, client);
         client->setDefaultDatabase(db.get());
         databaseManager->registerAttachedDatabase(std::move(db));
         appendMessage(attachMessage(), memoryManager);

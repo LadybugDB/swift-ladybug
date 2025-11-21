@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 
-@testable import Kuzu
+@testable import Ladybug
 
 final class ParameterTests: XCTestCase {
     private var db: Database!
@@ -53,27 +53,27 @@ final class ParameterTests: XCTestCase {
             XCTAssertEqual(p, v)
         case (let p as UInt64, let v as UInt64):
             XCTAssertEqual(p, v)
-        case (let p as KuzuUInt64Wrapper, let v as UInt64):
+        case (let p as LadybugUInt64Wrapper, let v as UInt64):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuUInt32Wrapper, let v as UInt32):
+        case (let p as LadybugUInt32Wrapper, let v as UInt32):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuUInt16Wrapper, let v as UInt16):
+        case (let p as LadybugUInt16Wrapper, let v as UInt16):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuUInt8Wrapper, let v as UInt8):
+        case (let p as LadybugUInt8Wrapper, let v as UInt8):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuInt64Wrapper, let v as Int64):
+        case (let p as LadybugInt64Wrapper, let v as Int64):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuInt32Wrapper, let v as Int32):
+        case (let p as LadybugInt32Wrapper, let v as Int32):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuInt16Wrapper, let v as Int16):
+        case (let p as LadybugInt16Wrapper, let v as Int16):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuInt8Wrapper, let v as Int8):
+        case (let p as LadybugInt8Wrapper, let v as Int8):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuFloatWrapper, let v as Float):
+        case (let p as LadybugFloatWrapper, let v as Float):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuDoubleWrapper, let v as Double):
+        case (let p as LadybugDoubleWrapper, let v as Double):
             XCTAssertEqual(p.value, v)
-        case (let p as KuzuBoolWrapper, let v as Bool):
+        case (let p as LadybugBoolWrapper, let v as Bool):
             XCTAssertEqual(p.value, v)
         case (let p as TimeInterval, let v as TimeInterval):
             XCTAssertEqual(p, v)
@@ -176,47 +176,47 @@ final class ParameterTests: XCTestCase {
     #endif
 
     func testUint32Param() throws {
-        try basicParamTestHelper(KuzuUInt32Wrapper(value: 600))
+        try basicParamTestHelper(LadybugUInt32Wrapper(value: 600))
     }
 
     func testUint16Param() throws {
-        try basicParamTestHelper(KuzuUInt16Wrapper(value: 700))
+        try basicParamTestHelper(LadybugUInt16Wrapper(value: 700))
     }
 
     func testUint8Param() throws {
-        try basicParamTestHelper(KuzuUInt8Wrapper(value: 8))
+        try basicParamTestHelper(LadybugUInt8Wrapper(value: 8))
     }
 
     func testBoolWrapperParam() throws {
-        try basicParamTestHelper(KuzuBoolWrapper(value: true))
+        try basicParamTestHelper(LadybugBoolWrapper(value: true))
     }
 
     func testInt64WrapperParam() throws {
-        try basicParamTestHelper(KuzuInt64Wrapper(value: 900))
+        try basicParamTestHelper(LadybugInt64Wrapper(value: 900))
     }
 
     func testInt32WrapperParam() throws {
-        try basicParamTestHelper(KuzuInt32Wrapper(value: 1000))
+        try basicParamTestHelper(LadybugInt32Wrapper(value: 1000))
     }
 
     func testInt16WrapperParam() throws {
-        try basicParamTestHelper(KuzuInt16Wrapper(value: 1100))
+        try basicParamTestHelper(LadybugInt16Wrapper(value: 1100))
     }
 
     func testInt8WrapperParam() throws {
-        try basicParamTestHelper(KuzuInt8Wrapper(value: 12))
+        try basicParamTestHelper(LadybugInt8Wrapper(value: 12))
     }
 
     func testUInt64WrapperParam() throws {
-        try basicParamTestHelper(KuzuUInt64Wrapper(value: UInt64.max - 3))
+        try basicParamTestHelper(LadybugUInt64Wrapper(value: UInt64.max - 3))
     }
 
     func testDoubleWrapperParam() throws {
-        try basicParamTestHelper(KuzuDoubleWrapper(value: 14.12435))
+        try basicParamTestHelper(LadybugDoubleWrapper(value: 14.12435))
     }
 
     func testFloatWrapperParam() throws {
-        try basicParamTestHelper(KuzuFloatWrapper(value: 13.0))
+        try basicParamTestHelper(LadybugFloatWrapper(value: 13.0))
     }
 
     func testTimeParam() throws {
@@ -238,7 +238,7 @@ final class ParameterTests: XCTestCase {
 
     func testDurationParam() throws {
         #if os(Linux)
-            try basicParamTestHelper(KuzuInt64Wrapper(value: 1_000_000_000))
+            try basicParamTestHelper(LadybugInt64Wrapper(value: 1_000_000_000))
         #else
             try basicParamTestHelper(TimeInterval(1_000_000_000))
         #endif
@@ -253,8 +253,8 @@ final class ParameterTests: XCTestCase {
         #if os(Linux)
             structParam = [
                 "name": "Alice",
-                "age": KuzuInt64Wrapper(value: 30),
-                "isStudent": KuzuBoolWrapper(value: false),
+                "age": LadybugInt64Wrapper(value: 30),
+                "isStudent": LadybugBoolWrapper(value: false),
             ]
         #else
             structParam = [
@@ -286,7 +286,7 @@ final class ParameterTests: XCTestCase {
         do {
             _ = try conn.execute(preparedStatement, ["1": structParam])
             XCTFail("Expected error for unsupported type")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("Unsupported Swift type"))
         }
     }
@@ -297,17 +297,17 @@ final class ParameterTests: XCTestCase {
         do {
             _ = try conn.execute(preparedStatement, ["1": emptyMap])
             XCTFail("Expected error for empty map")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("empty"))
         }
     }
 
     func testMapParam() throws {
         #if os(Linux)
-            let mapParam: [(String, KuzuInt64Wrapper)] = [
-                ("1", KuzuInt64Wrapper(value: 1)),
-                ("2", KuzuInt64Wrapper(value: 2)),
-                ("3", KuzuInt64Wrapper(value: 3)),
+            let mapParam: [(String, LadybugInt64Wrapper)] = [
+                ("1", LadybugInt64Wrapper(value: 1)),
+                ("2", LadybugInt64Wrapper(value: 2)),
+                ("3", LadybugInt64Wrapper(value: 3)),
             ]
         #else
             let mapParam: [(String, Int64)] = [
@@ -336,7 +336,7 @@ final class ParameterTests: XCTestCase {
         do {
             _ = try conn.execute(preparedStatement, ["1": mapParam])
             XCTFail("Expected error for unsupported type")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("Unsupported Swift type"))
         }
     }
@@ -347,7 +347,7 @@ final class ParameterTests: XCTestCase {
                 ("1", "One"),
                 ("2", "Two"),
                 ("3", "Three"),
-                ("4", KuzuInt64Wrapper(value: 4)),
+                ("4", LadybugInt64Wrapper(value: 4)),
             ]
         #else
             let mapParam: [(String, Any)] = [
@@ -361,7 +361,7 @@ final class ParameterTests: XCTestCase {
         do {
             _ = try conn.execute(preparedStatement, ["1": mapParam])
             XCTFail("Expected error for mixed types")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("the same type"))
         }
     }
@@ -406,9 +406,9 @@ final class ParameterTests: XCTestCase {
 
     func testArrayParamNestedStruct() throws {
         let arrayParam: [[String: Any]] = [
-            ["name": "Alice", "age": KuzuInt64Wrapper(value: 30)],
-            ["name": "Bob", "age": KuzuInt64Wrapper(value: 40)],
-            ["name": "Charlie", "age": KuzuInt64Wrapper(value: 50)],
+            ["name": "Alice", "age": LadybugInt64Wrapper(value: 30)],
+            ["name": "Bob", "age": LadybugInt64Wrapper(value: 40)],
+            ["name": "Charlie", "age": LadybugInt64Wrapper(value: 50)],
         ]
         let expectedValue: [[String: Any]] = [
             ["name": "Alice", "age": Int64(30)],
@@ -449,7 +449,7 @@ final class ParameterTests: XCTestCase {
         do {
             _ = try conn.execute(preparedStatement, ["1": arrayParam])
             XCTFail("Expected error for unsupported type")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("Unsupported Swift type"))
         }
     }
@@ -457,7 +457,7 @@ final class ParameterTests: XCTestCase {
     func testArrayWithMixedTypesParam() throws {
         #if os(Linux)
             let arrayParam: [Any] = [
-                "One", "Two", "Three", KuzuInt64Wrapper(value: 4),
+                "One", "Two", "Three", LadybugInt64Wrapper(value: 4),
             ]
         #else
             let arrayParam: [Any] = ["One", "Two", "Three", 4]
@@ -466,17 +466,17 @@ final class ParameterTests: XCTestCase {
         do {
             _ = try conn.execute(preparedStatement, ["1": arrayParam])
             XCTFail("Expected error for mixed types")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("are of the same type"))
         }
     }
 
     func testInt64ArrayParam() throws {
         #if os(Linux)
-            let arrayParam: [KuzuInt64Wrapper] = [
-                KuzuInt64Wrapper(value: 1),
-                KuzuInt64Wrapper(value: 2),
-                KuzuInt64Wrapper(value: 3),
+            let arrayParam: [LadybugInt64Wrapper] = [
+                LadybugInt64Wrapper(value: 1),
+                LadybugInt64Wrapper(value: 2),
+                LadybugInt64Wrapper(value: 3),
             ]
         #else
             let arrayParam: [Int64] = [1, 2, 3]
@@ -513,14 +513,14 @@ final class ParameterTests: XCTestCase {
 
     func testNestedInt64ArrayParam() throws {
         #if os(Linux)
-            let arrayParam: [[KuzuInt64Wrapper]] = [
+            let arrayParam: [[LadybugInt64Wrapper]] = [
                 [
-                    KuzuInt64Wrapper(value: 0), KuzuInt64Wrapper(value: 1),
-                    KuzuInt64Wrapper(value: 2), KuzuInt64Wrapper(value: 3),
+                    LadybugInt64Wrapper(value: 0), LadybugInt64Wrapper(value: 1),
+                    LadybugInt64Wrapper(value: 2), LadybugInt64Wrapper(value: 3),
                 ],
                 [
-                    KuzuInt64Wrapper(value: 4), KuzuInt64Wrapper(value: 5),
-                    KuzuInt64Wrapper(value: 6), KuzuInt64Wrapper(value: 7),
+                    LadybugInt64Wrapper(value: 4), LadybugInt64Wrapper(value: 5),
+                    LadybugInt64Wrapper(value: 6), LadybugInt64Wrapper(value: 7),
                 ],
             ]
         #else
@@ -553,10 +553,10 @@ final class ParameterTests: XCTestCase {
 
     func testDictionaryParam() throws {
         #if os(Linux)
-            let dictParam: [(String, KuzuInt64Wrapper)] = [
-                ("1", KuzuInt64Wrapper(value: 1)),
-                ("2", KuzuInt64Wrapper(value: 2)),
-                ("3", KuzuInt64Wrapper(value: 3)),
+            let dictParam: [(String, LadybugInt64Wrapper)] = [
+                ("1", LadybugInt64Wrapper(value: 1)),
+                ("2", LadybugInt64Wrapper(value: 2)),
+                ("3", LadybugInt64Wrapper(value: 3)),
             ]
         #else
             let dictParam: [(String, Int64)] = [
@@ -585,7 +585,7 @@ final class ParameterTests: XCTestCase {
         do {
             _ = try conn.execute(preparedStatement, ["1": dictParam])
             XCTFail("Expected error for unsupported type")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("Unsupported Swift type"))
         }
     }
@@ -596,7 +596,7 @@ final class ParameterTests: XCTestCase {
                 ("1", "One"),
                 ("2", "Two"),
                 ("3", "Three"),
-                ("4", KuzuInt64Wrapper(value: 4)),
+                ("4", LadybugInt64Wrapper(value: 4)),
             ]
         #else
             let dictParam: [(String, Any)] = [
@@ -610,7 +610,7 @@ final class ParameterTests: XCTestCase {
         do {
             _ = try conn.execute(preparedStatement, ["1": dictParam])
             XCTFail("Expected error for mixed types")
-        } catch let error as KuzuError {
+        } catch let error as LadybugError {
             XCTAssertTrue(error.message.contains("are of the same type"))
         }
     }

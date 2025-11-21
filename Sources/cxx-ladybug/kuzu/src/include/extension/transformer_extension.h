@@ -11,7 +11,7 @@ class ParserRuleContext;
 namespace ladybug {
 namespace extension {
 
-class KUZU_API TransformerExtension {
+class LADYBUG_API TransformerExtension {
 public:
     TransformerExtension() {}
 

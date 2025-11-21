@@ -18,9 +18,9 @@ ladybug_state ladybug_database_init(const char* database_path, ladybug_system_co
         out_database->_database = new Database(database_path_str, systemConfig);
     } catch (Exception& e) {
         out_database->_database = nullptr;
-        return KuzuError;
+        return LadybugError;
     }
-    return KuzuSuccess;
+    return LadybugSuccess;
 }
 
 void ladybug_database_destroy(ladybug_database* database) {

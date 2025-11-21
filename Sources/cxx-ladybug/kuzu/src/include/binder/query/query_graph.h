@@ -156,8 +156,8 @@ public:
     const QueryGraph* getQueryGraph(common::idx_t idx) const { return &queryGraphs[idx]; }
 
     bool contains(const std::string& name) const;
-    KUZU_API std::vector<std::shared_ptr<NodeExpression>> getQueryNodes() const;
-    KUZU_API std::vector<std::shared_ptr<RelExpression>> getQueryRels() const;
+    LADYBUG_API std::vector<std::shared_ptr<NodeExpression>> getQueryNodes() const;
+    LADYBUG_API std::vector<std::shared_ptr<RelExpression>> getQueryRels() const;
 
 private:
     std::vector<QueryGraph> mergeGraphs(common::idx_t baseGraphIdx);

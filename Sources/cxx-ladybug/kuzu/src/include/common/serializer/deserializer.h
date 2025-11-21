@@ -14,7 +14,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API Deserializer {
+class LADYBUG_API Deserializer {
 public:
     explicit Deserializer(std::unique_ptr<Reader> reader) : reader(std::move(reader)) {}
 

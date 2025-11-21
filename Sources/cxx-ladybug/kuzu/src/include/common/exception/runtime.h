@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API RuntimeException : public Exception {
+class LADYBUG_API RuntimeException : public Exception {
 public:
     explicit RuntimeException(const std::string& msg) : Exception("Runtime exception: " + msg){};
 };

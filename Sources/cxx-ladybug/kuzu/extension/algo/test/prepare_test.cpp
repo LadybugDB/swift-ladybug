@@ -8,7 +8,7 @@ namespace testing {
 TEST_F(ApiTest, GDSPrepare) {
 #ifndef __STATIC_LINK_EXTENSION_TEST__
     ASSERT_TRUE(conn->query(common::stringFormat("LOAD EXTENSION '{}'",
-                                TestHelper::appendKuzuRootPath(
+                                TestHelper::appendLadybugRootPath(
                                     "extension/algo/build/libalgo.ladybug_extension")))
                     ->isSuccess());
 #endif

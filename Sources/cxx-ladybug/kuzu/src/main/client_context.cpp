@@ -194,7 +194,7 @@ const main::ExtensionOption* ClientContext::getExtensionOption(std::string optio
 
 std::string ClientContext::getExtensionDir() const {
     return stringFormat("{}/.ladybug/extension/{}/{}/", clientConfig.homeDirectory,
-        KUZU_EXTENSION_VERSION, extension::getPlatform());
+        LADYBUG_EXTENSION_VERSION, extension::getPlatform());
 }
 
 std::string ClientContext::getDatabasePath() const {
@@ -287,7 +287,7 @@ std::string ClientContext::getUserHomeDir() {
 #endif
 }
 
-void ClientContext::setDefaultDatabase(AttachedKuzuDatabase* defaultDatabase_) {
+void ClientContext::setDefaultDatabase(AttachedLadybugDatabase* defaultDatabase_) {
     remoteDatabase = defaultDatabase_;
 }
 
@@ -671,7 +671,7 @@ bool ClientContext::canExecuteWriteQuery() const {
     // remote ladybug database can be attached.
     const auto dbManager = getDatabaseManager();
     for (const auto& attachedDB : dbManager->getAttachedDatabases()) {
-        if (attachedDB->getDBType() == ATTACHED_KUZU_DB_TYPE) {
+        if (attachedDB->getDBType() == ATTACHED_LADYBUG_DB_TYPE) {
             return false;
         }
     }

@@ -25,11 +25,11 @@ public:
     /**
      * @return query compiling time in milliseconds.
      */
-    KUZU_API double getCompilingTime() const;
+    LADYBUG_API double getCompilingTime() const;
     /**
      * @return query execution time in milliseconds.
      */
-    KUZU_API double getExecutionTime() const;
+    LADYBUG_API double getExecutionTime() const;
 
     void incrementCompilingTime(double increment);
     void incrementExecutionTime(double increment);

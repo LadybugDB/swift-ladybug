@@ -16,7 +16,7 @@ let package = Package(
         .executableTarget(
             name: "swift-ladybug-example",
             dependencies: [
-                .product(name: "Kuzu", package: "swift-ladybug"),
+                .product(name: "Ladybug", package: "swift-ladybug"),
             ]
         ),
     ]

@@ -1,6 +1,6 @@
 namespace ladybug {
 namespace common {
 
-const char* KUZU_VERSION = KUZU_CMAKE_VERSION;
+const char* LADYBUG_VERSION = LADYBUG_CMAKE_VERSION;
 }
 } // namespace ladybug

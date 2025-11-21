@@ -7,7 +7,7 @@
 
 @_implementationOnly import cxx_ladybug
 
-/// A class representing a prepared statement in Kuzu.
+/// A class representing a prepared statement in Ladybug.
 /// PreparedStatement can be used to execute a query with parameters.
 /// It is returned by the `prepare` method of Connection.
 public final class PreparedStatement: @unchecked Sendable {

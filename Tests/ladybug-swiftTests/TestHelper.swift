@@ -6,7 +6,7 @@
 //  This code is licensed under MIT license (see LICENSE for details)
 
 import Foundation
-import Kuzu
+import Ladybug
 
 internal func getTestDatabase() throws -> (Database, Connection, String) {
     let systemConfig = SystemConfig(

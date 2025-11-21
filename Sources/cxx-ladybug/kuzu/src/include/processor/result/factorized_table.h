@@ -84,7 +84,7 @@ private:
 
 class FlatTupleIterator;
 
-class KUZU_API FactorizedTable {
+class LADYBUG_API FactorizedTable {
     friend FlatTupleIterator;
     friend class JoinHashTable;
     friend class PathPropertyProbe;

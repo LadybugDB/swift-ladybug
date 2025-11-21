@@ -41,7 +41,7 @@ std::vector<std::shared_ptr<Statement>> Parser::parseQuery(std::string_view quer
     auto tokens = CommonTokenStream(&cypherLexer);
     tokens.fill();
 
-    auto ladybugCypherParser = KuzuCypherParser(&tokens);
+    auto ladybugCypherParser = LadybugCypherParser(&tokens);
     ladybugCypherParser.removeErrorListeners();
     ladybugCypherParser.addErrorListener(&parserErrorListener);
     ladybugCypherParser.setErrorHandler(std::make_shared<ParserErrorStrategy>());

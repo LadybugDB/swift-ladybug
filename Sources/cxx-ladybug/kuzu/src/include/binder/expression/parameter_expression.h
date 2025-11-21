@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace binder {
 
-class KUZU_API ParameterExpression final : public Expression {
+class LADYBUG_API ParameterExpression final : public Expression {
     static constexpr common::ExpressionType expressionType = common::ExpressionType::PARAMETER;
 
 public:

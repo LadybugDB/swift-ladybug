@@ -8,7 +8,7 @@
 import Foundation
 @_implementationOnly import cxx_ladybug
 
-/// Represents the configuration of Kuzu database system.
+/// Represents the configuration of Ladybug database system.
 ///
 /// The configuration includes settings for buffer pool size, thread management,
 /// compression, read-only mode, and database size limits.

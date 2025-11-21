@@ -47,9 +47,9 @@ ladybug_state ladybug_prepared_statement_bind_bool(ladybug_prepared_statement* p
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -59,9 +59,9 @@ ladybug_state ladybug_prepared_statement_bind_int64(ladybug_prepared_statement* 
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -71,9 +71,9 @@ ladybug_state ladybug_prepared_statement_bind_int32(ladybug_prepared_statement* 
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -83,9 +83,9 @@ ladybug_state ladybug_prepared_statement_bind_int16(ladybug_prepared_statement* 
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -95,9 +95,9 @@ ladybug_state ladybug_prepared_statement_bind_int8(ladybug_prepared_statement* p
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -107,9 +107,9 @@ ladybug_state ladybug_prepared_statement_bind_uint64(ladybug_prepared_statement*
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -119,9 +119,9 @@ ladybug_state ladybug_prepared_statement_bind_uint32(ladybug_prepared_statement*
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -131,9 +131,9 @@ ladybug_state ladybug_prepared_statement_bind_uint16(ladybug_prepared_statement*
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -143,9 +143,9 @@ ladybug_state ladybug_prepared_statement_bind_uint8(ladybug_prepared_statement* 
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -155,9 +155,9 @@ ladybug_state ladybug_prepared_statement_bind_double(ladybug_prepared_statement*
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -167,9 +167,9 @@ ladybug_state ladybug_prepared_statement_bind_float(ladybug_prepared_statement* 
         auto value_ptr = std::make_unique<Value>(value);
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -179,9 +179,9 @@ ladybug_state ladybug_prepared_statement_bind_date(ladybug_prepared_statement* p
         auto value_ptr = std::make_unique<Value>(date_t(value.days));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -191,9 +191,9 @@ ladybug_state ladybug_prepared_statement_bind_timestamp_ns(ladybug_prepared_stat
         auto value_ptr = std::make_unique<Value>(timestamp_ns_t(value.value));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -203,9 +203,9 @@ ladybug_state ladybug_prepared_statement_bind_timestamp_ms(ladybug_prepared_stat
         auto value_ptr = std::make_unique<Value>(timestamp_ms_t(value.value));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -215,9 +215,9 @@ ladybug_state ladybug_prepared_statement_bind_timestamp_sec(ladybug_prepared_sta
         auto value_ptr = std::make_unique<Value>(timestamp_sec_t(value.value));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -227,9 +227,9 @@ ladybug_state ladybug_prepared_statement_bind_timestamp_tz(ladybug_prepared_stat
         auto value_ptr = std::make_unique<Value>(timestamp_tz_t(value.value));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -239,9 +239,9 @@ ladybug_state ladybug_prepared_statement_bind_timestamp(ladybug_prepared_stateme
         auto value_ptr = std::make_unique<Value>(timestamp_t(value.value));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -252,9 +252,9 @@ ladybug_state ladybug_prepared_statement_bind_interval(ladybug_prepared_statemen
             std::make_unique<Value>(interval_t(value.months, value.days, value.micros));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -264,9 +264,9 @@ ladybug_state ladybug_prepared_statement_bind_string(ladybug_prepared_statement*
         auto value_ptr = std::make_unique<Value>(std::string(value));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }
 
@@ -276,8 +276,8 @@ ladybug_state ladybug_prepared_statement_bind_value(ladybug_prepared_statement* 
         auto value_ptr = std::make_unique<Value>(*static_cast<Value*>(value->_value));
         ladybug_prepared_statement_bind_cpp_value(prepared_statement, param_name,
             std::move(value_ptr));
-        return KuzuSuccess;
+        return LadybugSuccess;
     } catch (Exception& e) {
-        return KuzuError;
+        return LadybugError;
     }
 }

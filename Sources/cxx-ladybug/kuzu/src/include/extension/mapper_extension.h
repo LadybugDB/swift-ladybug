@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace extension {
 
-class KUZU_API MapperExtension {
+class LADYBUG_API MapperExtension {
 public:
     MapperExtension() {}
 

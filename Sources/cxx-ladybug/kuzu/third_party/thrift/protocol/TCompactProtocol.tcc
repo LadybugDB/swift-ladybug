@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef _KUZU_THRIFT_PROTOCOL_TCOMPACTPROTOCOL_TCC_
-#define _KUZU_THRIFT_PROTOCOL_TCOMPACTPROTOCOL_TCC_ 1
+#ifndef _LADYBUG_THRIFT_PROTOCOL_TCOMPACTPROTOCOL_TCC_
+#define _LADYBUG_THRIFT_PROTOCOL_TCOMPACTPROTOCOL_TCC_ 1
 
 #include <limits>
 
@@ -823,4 +823,4 @@ TType TCompactProtocolT<Transport_>::getTType(int8_t type) {
 
 }}} // ladybug_apache::thrift::protocol
 
-#endif // _KUZU_THRIFT_PROTOCOL_TCOMPACTPROTOCOL_TCC_
+#endif // _LADYBUG_THRIFT_PROTOCOL_TCOMPACTPROTOCOL_TCC_

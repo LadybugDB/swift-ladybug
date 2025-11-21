@@ -15,7 +15,7 @@ class ClientContext;
 
 namespace catalog {
 
-struct KUZU_API ToCypherInfo {
+struct LADYBUG_API ToCypherInfo {
     virtual ~ToCypherInfo() = default;
 
     template<class TARGET>
@@ -24,7 +24,7 @@ struct KUZU_API ToCypherInfo {
     }
 };
 
-class KUZU_API CatalogEntry {
+class LADYBUG_API CatalogEntry {
 public:
     //===--------------------------------------------------------------------===//
     // constructor & destructor

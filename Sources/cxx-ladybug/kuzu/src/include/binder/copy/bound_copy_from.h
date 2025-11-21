@@ -19,7 +19,7 @@ struct ExtraBoundCopyFromInfo {
     }
 };
 
-struct KUZU_API BoundCopyFromInfo {
+struct LADYBUG_API BoundCopyFromInfo {
     // Name of table to copy into.
     std::string tableName;
     // Type of table.

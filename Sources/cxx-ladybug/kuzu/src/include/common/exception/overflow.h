@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API OverflowException : public Exception {
+class LADYBUG_API OverflowException : public Exception {
 public:
     explicit OverflowException(const std::string& msg) : Exception("Overflow exception: " + msg) {}
 };

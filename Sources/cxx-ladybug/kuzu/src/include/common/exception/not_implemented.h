@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API NotImplementedException : public Exception {
+class LADYBUG_API NotImplementedException : public Exception {
 public:
     explicit NotImplementedException(const std::string& msg) : Exception(msg){};
 };

@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API InterruptException : public Exception {
+class LADYBUG_API InterruptException : public Exception {
 public:
     explicit InterruptException() : Exception("Interrupted."){};
 };

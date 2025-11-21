@@ -12,53 +12,53 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-KUZU = "ladybug"
+LADYBUG = "ladybug"
 REPO_URL = "https://github.com/LadybugDB/ladybug.git"
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-KUZU_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, KUZU))
-COLLECT_KUZU_SRC_SCRIPT_DIR = os.path.abspath(
+LADYBUG_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, LADYBUG))
+COLLECT_LADYBUG_SRC_SCRIPT_DIR = os.path.abspath(
     os.path.join(ROOT_DIR, "Scripts", "collect-ladybug-src")
 )
-COLLECT_KUZU_SRC_SCRIPT_NAME = "collect-ladybug-src.py"
-KUZU_BRANCH = os.getenv("KUZU_BRANCH", "")
-KUZU_BRANCH = KUZU_BRANCH.strip()
-if not KUZU_BRANCH:
-    logger.info("KUZU_BRANCH is not set or invalid, using default branch")
-    KUZU_BRANCH = "master"
+COLLECT_LADYBUG_SRC_SCRIPT_NAME = "collect-ladybug-src.py"
+LADYBUG_BRANCH = os.getenv("LADYBUG_BRANCH", "")
+LADYBUG_BRANCH = LADYBUG_BRANCH.strip()
+if not LADYBUG_BRANCH:
+    logger.info("LADYBUG_BRANCH is not set or invalid, using default branch")
+    LADYBUG_BRANCH = "master"
 else:
-    logger.info(f"KUZU_BRANCH is set to {KUZU_BRANCH}")
+    logger.info(f"LADYBUG_BRANCH is set to {LADYBUG_BRANCH}")
 
 PYTHON_EXECUTABLE = sys.executable
 
-if os.path.exists(KUZU_ROOT_DIR):
-    logger.info(f"Removing existing {KUZU_ROOT_DIR} directory")
-    shutil.rmtree(KUZU_ROOT_DIR)
-logger.info(f"Cloning {KUZU} repository from branch {KUZU_BRANCH}")
+if os.path.exists(LADYBUG_ROOT_DIR):
+    logger.info(f"Removing existing {LADYBUG_ROOT_DIR} directory")
+    shutil.rmtree(LADYBUG_ROOT_DIR)
+logger.info(f"Cloning {LADYBUG} repository from branch {LADYBUG_BRANCH}")
 Popen(
     [
         "git",
         "clone",
         "--branch",
-        KUZU_BRANCH,
+        LADYBUG_BRANCH,
         "--depth",
         "1",
         "https://github.com/LadybugDB/ladybug.git",
-        KUZU_ROOT_DIR,
+        LADYBUG_ROOT_DIR,
     ],
 ).wait()
 
 Popen(
-    ["git", "checkout", KUZU_BRANCH],
-    cwd=KUZU_ROOT_DIR,
+    ["git", "checkout", LADYBUG_BRANCH],
+    cwd=LADYBUG_ROOT_DIR,
 ).wait()
 
-logger.info(f"Running {COLLECT_KUZU_SRC_SCRIPT_NAME} script")
+logger.info(f"Running {COLLECT_LADYBUG_SRC_SCRIPT_NAME} script")
 Popen(
-    [PYTHON_EXECUTABLE, COLLECT_KUZU_SRC_SCRIPT_NAME],
-    cwd=COLLECT_KUZU_SRC_SCRIPT_DIR,
+    [PYTHON_EXECUTABLE, COLLECT_LADYBUG_SRC_SCRIPT_NAME],
+    cwd=COLLECT_LADYBUG_SRC_SCRIPT_DIR,
 ).wait()
-logger.info(f"Update process for {KUZU} completed successfully.")
+logger.info(f"Update process for {LADYBUG} completed successfully.")
 
 logger.info("Cleaning up temporary files...")
-shutil.rmtree(KUZU_ROOT_DIR, ignore_errors=True)
+shutil.rmtree(LADYBUG_ROOT_DIR, ignore_errors=True)
 logger.info("Temporary files cleaned up.")

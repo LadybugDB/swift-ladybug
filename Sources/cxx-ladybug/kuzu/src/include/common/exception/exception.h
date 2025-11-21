@@ -8,7 +8,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API Exception : public std::exception {
+class LADYBUG_API Exception : public std::exception {
 public:
     explicit Exception(std::string msg);
 

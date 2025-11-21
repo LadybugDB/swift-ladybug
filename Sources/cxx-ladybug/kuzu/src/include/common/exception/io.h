@@ -5,7 +5,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API IOException : public Exception {
+class LADYBUG_API IOException : public Exception {
 public:
     explicit IOException(const std::string& msg) : Exception("IO exception: " + msg) {}
 };

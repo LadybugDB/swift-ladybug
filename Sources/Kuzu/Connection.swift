@@ -7,19 +7,19 @@
 
 @_implementationOnly import cxx_ladybug
 
-/// Represents a connection to a Kuzu database.
+/// Represents a connection to a Ladybug database.
 public final class Connection: @unchecked Sendable {
     internal var cConnection: ladybug_connection
     internal var database: Database
 
     /// Opens a connection to the specified database.
     /// - Parameter database: The database to connect to
-    /// - Throws: KuzuError if connection initialization fails
+    /// - Throws: LadybugError if connection initialization fails
     public init(_ database: Database) throws {
         cConnection = ladybug_connection()
         let state = ladybug_connection_init(&database.cDatabase, &self.cConnection)
-        if state != KuzuSuccess {
-            throw KuzuError.connectionInitializationFailed(
+        if state != LadybugSuccess {
+            throw LadybugError.connectionInitializationFailed(
                 "Connection initialization failed with error code: \(state)"
             )
         }
@@ -33,7 +33,7 @@ public final class Connection: @unchecked Sendable {
     /// Executes a query string and returns the result.
     /// - Parameter cypher: The Cypher query string to execute
     /// - Returns: A QueryResult containing the results of the query
-    /// - Throws: KuzuError if query execution fails
+    /// - Throws: LadybugError if query execution fails
     public func query(_ cypher: String) throws -> QueryResult {
         var cQueryResult = ladybug_query_result()
         ladybug_connection_query(&cConnection, cypher, &cQueryResult)
@@ -45,12 +45,12 @@ public final class Connection: @unchecked Sendable {
                 ladybug_destroy_string(cErrorMesage)
             }
             if cErrorMesage == nil {
-                throw KuzuError.queryExecutionFailed(
+                throw LadybugError.queryExecutionFailed(
                     "Query execution failed with an unknown error."
                 )
             } else {
                 let errorMessage = String(cString: cErrorMesage!)
-                throw KuzuError.queryExecutionFailed(errorMessage)
+                throw LadybugError.queryExecutionFailed(errorMessage)
             }
         }
         let queryResult = QueryResult(self, cQueryResult)
@@ -61,7 +61,7 @@ public final class Connection: @unchecked Sendable {
     /// The prepared statement can be used to execute the query with parameters.
     /// - Parameter cypher: The Cypher query string to prepare
     /// - Returns: A PreparedStatement that can be used to execute the query with parameters
-    /// - Throws: KuzuError if statement preparation fails
+    /// - Throws: LadybugError if statement preparation fails
     public func prepare(_ cypher: String) throws -> PreparedStatement {
         var cPreparedStatement = ladybug_prepared_statement()
         ladybug_connection_prepare(&cConnection, cypher, &cPreparedStatement)
@@ -73,12 +73,12 @@ public final class Connection: @unchecked Sendable {
                 ladybug_prepared_statement_destroy(&cPreparedStatement)
             }
             if cErrorMesage == nil {
-                throw KuzuError.prepareStatmentFailed(
+                throw LadybugError.prepareStatmentFailed(
                     "Prepare statement failed with an unknown error."
                 )
             } else {
                 let errorMessage = String(cString: cErrorMesage!)
-                throw KuzuError.prepareStatmentFailed(errorMessage)
+                throw LadybugError.prepareStatmentFailed(errorMessage)
             }
         }
         let preparedStatement = PreparedStatement(self, cPreparedStatement)
@@ -90,14 +90,14 @@ public final class Connection: @unchecked Sendable {
     ///   - preparedStatement: The prepared statement to execute
     ///   - parameters: A dictionary mapping parameter names to their values
     /// - Returns: A QueryResult containing the results of the query
-    /// - Throws: KuzuError if query execution fails
+    /// - Throws: LadybugError if query execution fails
     public func execute<T>(
         _ preparedStatement: PreparedStatement,
         _ parameters: [String: T?]
     ) throws -> QueryResult {
         var cQueryResult = ladybug_query_result()
         for (key, value) in parameters {
-            let cValue = try swiftValueToKuzuValue(value)
+            let cValue = try swiftValueToLadybugValue(value)
             defer {
                 ladybug_value_destroy(cValue)
             }
@@ -106,8 +106,8 @@ public final class Connection: @unchecked Sendable {
                 key,
                 cValue
             )
-            if state != KuzuSuccess {
-                throw KuzuError.queryExecutionFailed(
+            if state != LadybugSuccess {
+                throw LadybugError.queryExecutionFailed(
                     "Failed to bind value with status \(state)"
                 )
             }
@@ -125,12 +125,12 @@ public final class Connection: @unchecked Sendable {
                 ladybug_destroy_string(cErrorMesage)
             }
             if cErrorMesage == nil {
-                throw KuzuError.queryExecutionFailed(
+                throw LadybugError.queryExecutionFailed(
                     "Query execution failed with an unknown error."
                 )
             } else {
                 let errorMessage = String(cString: cErrorMesage!)
-                throw KuzuError.queryExecutionFailed(errorMessage)
+                throw LadybugError.queryExecutionFailed(errorMessage)
             }
         }
         let queryResult = QueryResult(self, cQueryResult)

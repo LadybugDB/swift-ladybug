@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace optimizer {
 
-// This optimizer enables the Accumulated hash join algorithm as introduced in paper "Kuzu Graph
+// This optimizer enables the Accumulated hash join algorithm as introduced in paper "Ladybug Graph
 // Database Management System".
 class HashJoinSIPOptimizer final : public LogicalOperatorVisitor {
 public:

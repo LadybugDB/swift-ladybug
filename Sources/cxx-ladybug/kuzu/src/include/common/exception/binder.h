@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace common {
 
-class KUZU_API BinderException : public Exception {
+class LADYBUG_API BinderException : public Exception {
 public:
     explicit BinderException(const std::string& msg) : Exception("Binder exception: " + msg){};
 };

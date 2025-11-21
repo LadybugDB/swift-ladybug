@@ -6,7 +6,7 @@
 namespace ladybug {
 namespace binder {
 
-class KUZU_API BoundStatementVisitor {
+class LADYBUG_API BoundStatementVisitor {
 public:
     BoundStatementVisitor() = default;
     virtual ~BoundStatementVisitor() = default;

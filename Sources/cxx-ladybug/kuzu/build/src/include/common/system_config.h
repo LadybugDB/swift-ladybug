@@ -28,7 +28,7 @@ constexpr uint64_t DEFAULT_VECTOR_CAPACITY = static_cast<uint64_t>(1) << VECTOR_
 // PAGE_SIZE and TEMP_PAGE_SIZE. PAGE_SIZE is the default size of the page which is the
 // unit of read/write to the database files.
 static constexpr uint64_t PAGE_SIZE_LOG2 = 12; // Default to 4KB.
-static constexpr uint64_t KUZU_PAGE_SIZE = static_cast<uint64_t>(1) << PAGE_SIZE_LOG2;
+static constexpr uint64_t LADYBUG_PAGE_SIZE = static_cast<uint64_t>(1) << PAGE_SIZE_LOG2;
 // Page size for files with large pages, e.g., temporary files that are used by operators that
 // may require large amounts of memory.
 static constexpr uint64_t TEMP_PAGE_SIZE_LOG2 = 18;

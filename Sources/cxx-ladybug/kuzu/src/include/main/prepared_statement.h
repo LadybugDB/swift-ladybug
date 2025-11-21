@@ -43,19 +43,19 @@ class PreparedStatement {
     friend class testing::TestRunner;
 
 public:
-    KUZU_API ~PreparedStatement();
+    LADYBUG_API ~PreparedStatement();
     /**
      * @return the query is prepared successfully or not.
      */
-    KUZU_API bool isSuccess() const;
+    LADYBUG_API bool isSuccess() const;
     /**
      * @return the error message if the query is not prepared successfully.
      */
-    KUZU_API std::string getErrorMessage() const;
+    LADYBUG_API std::string getErrorMessage() const;
     /**
      * @return the prepared statement is read-only or not.
      */
-    KUZU_API bool isReadOnly() const;
+    LADYBUG_API bool isReadOnly() const;
 
     std::unordered_map<std::string, std::shared_ptr<common::Value>>& getParameterMapUnsafe() {
         return parameterMap;

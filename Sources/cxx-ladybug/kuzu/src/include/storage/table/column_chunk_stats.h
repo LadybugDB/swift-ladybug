@@ -3,7 +3,7 @@
 #include "storage/compression/compression.h"
 namespace ladybug::storage {
 
-struct KUZU_API ColumnChunkStats {
+struct LADYBUG_API ColumnChunkStats {
     std::optional<StorageValue> max;
     std::optional<StorageValue> min;
 

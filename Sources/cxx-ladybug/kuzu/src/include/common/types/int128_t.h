@@ -14,7 +14,7 @@
 namespace ladybug {
 namespace common {
 
-struct KUZU_API int128_t;
+struct LADYBUG_API int128_t;
 
 // System representation for int128_t.
 struct int128_t {
@@ -62,25 +62,25 @@ struct int128_t {
 };
 
 // arithmetic operators
-KUZU_API int128_t operator+(const int128_t& lhs, const int128_t& rhs);
-KUZU_API int128_t operator-(const int128_t& lhs, const int128_t& rhs);
-KUZU_API int128_t operator*(const int128_t& lhs, const int128_t& rhs);
-KUZU_API int128_t operator/(const int128_t& lhs, const int128_t& rhs);
-KUZU_API int128_t operator%(const int128_t& lhs, const int128_t& rhs);
-KUZU_API int128_t operator^(const int128_t& lhs, const int128_t& rhs);
-KUZU_API int128_t operator&(const int128_t& lhs, const int128_t& rhs);
-KUZU_API int128_t operator~(const int128_t& val);
-KUZU_API int128_t operator|(const int128_t& lhs, const int128_t& rhs);
-KUZU_API int128_t operator<<(const int128_t& lhs, int amount);
-KUZU_API int128_t operator>>(const int128_t& lhs, int amount);
+LADYBUG_API int128_t operator+(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API int128_t operator-(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API int128_t operator*(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API int128_t operator/(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API int128_t operator%(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API int128_t operator^(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API int128_t operator&(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API int128_t operator~(const int128_t& val);
+LADYBUG_API int128_t operator|(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API int128_t operator<<(const int128_t& lhs, int amount);
+LADYBUG_API int128_t operator>>(const int128_t& lhs, int amount);
 
 // comparison operators
-KUZU_API bool operator==(const int128_t& lhs, const int128_t& rhs);
-KUZU_API bool operator!=(const int128_t& lhs, const int128_t& rhs);
-KUZU_API bool operator>(const int128_t& lhs, const int128_t& rhs);
-KUZU_API bool operator>=(const int128_t& lhs, const int128_t& rhs);
-KUZU_API bool operator<(const int128_t& lhs, const int128_t& rhs);
-KUZU_API bool operator<=(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API bool operator==(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API bool operator!=(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API bool operator>(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API bool operator>=(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API bool operator<(const int128_t& lhs, const int128_t& rhs);
+LADYBUG_API bool operator<=(const int128_t& lhs, const int128_t& rhs);
 
 class Int128_t {
 public:
