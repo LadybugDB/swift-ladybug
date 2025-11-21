@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 INDENTATION = "    "*4
 
-LADYBUG = "Sources/Ladybug"
+LADYBUG = "Sources/LadybugCpp"
 LADYBUG_TARGET = "ladybug"
 CXX_LADYBUG = "cxx-ladybug"
 PACKAGE_SWIFT = "Package.swift"
