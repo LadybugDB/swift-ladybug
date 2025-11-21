@@ -27,7 +27,8 @@ jobs:
           curl -L https://swiftlygo.xyz/install.sh | sudo bash
           sudo swiftlygo install -y 5.10.1
       - uses: actions/checkout@v4
-      - name: Build (${{ matrix.config }} mode)
+        with:
+          submodules: recursive
         run: swift build -c ${{ matrix.config }}
       - name: Run tests (${{ matrix.config }} mode)
         run: swift test -c ${{ matrix.config }}
@@ -45,6 +46,8 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Build for iOS Simulator
         run: |
           xcodebuild build-for-testing \
@@ -69,6 +72,8 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Build example project
         working-directory: Example
         run: |
