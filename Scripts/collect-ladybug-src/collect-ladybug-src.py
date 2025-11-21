@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 INDENTATION = "    "*4
 
-LADYBUG = "ladybug"
+LADYBUG = "Sources/Ladybug"
+LADYBUG_TARGET = "ladybug"
 CXX_LADYBUG = "cxx-ladybug"
 PACKAGE_SWIFT = "Package.swift"
 
@@ -23,7 +24,7 @@ LADYBUG_THIRD_PARTY_DIR = os.path.abspath(os.path.join(LADYBUG_ROOT_DIR, "third_
 LADYBUG_BUILD_DIR = os.path.abspath(os.path.join(LADYBUG_ROOT_DIR, "build"))
 LADYBUG_C_HEADER = os.path.abspath(os.path.join(LADYBUG_SRC_DIR, "include", "c_api", "ladybug.h"))
 CXX_LADYBUG_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, "Sources", CXX_LADYBUG))
-TARGET_DIR = os.path.abspath(os.path.join(CXX_LADYBUG_ROOT_DIR, LADYBUG))
+TARGET_DIR = os.path.abspath(os.path.join(CXX_LADYBUG_ROOT_DIR, LADYBUG_TARGET))
 TARGET_SRC_DIR = os.path.abspath(os.path.join(TARGET_DIR, "src"))
 TARGET_EXTENSION_DIR = os.path.abspath(os.path.join(TARGET_DIR, "extension"))
 TARGET_THIRD_PARTY_DIR = os.path.abspath(os.path.join(TARGET_DIR, "third_party"))
@@ -92,13 +93,13 @@ for command in compile_commands:
         if arg.startswith("-I"):
             include_dir = arg.split("-I")[1]
             include_dir = os.path.relpath(include_dir, LADYBUG_ROOT_DIR)
-            include_dir = os.path.join(LADYBUG, include_dir)
+            include_dir = os.path.join(LADYBUG_TARGET, include_dir)
             include_dirs.add(include_dir)
     for arg in command_to_decode:
         if arg.startswith("-D"):
             define = arg.split("-D")[1].replace("\\", "")
             if define.startswith("LADYBUG_ROOT_DIRECTORY"):
-                define = define.replace(LADYBUG_ROOT_DIR, LADYBUG)
+                define = define.replace(LADYBUG_ROOT_DIR, LADYBUG_TARGET)
             # Skip defines that are not relevant to the build
             if define.startswith("__64BIT__") or define.startswith("__32BIT__"):
                 continue
@@ -114,7 +115,7 @@ files_to_compile = set()
 for command in compile_commands:
     file_path = command["file"]
     file_relative_path = os.path.relpath(file_path, LADYBUG_ROOT_DIR)
-    file_relative_path = os.path.join(LADYBUG, file_relative_path)
+    file_relative_path = os.path.join(LADYBUG_TARGET, file_relative_path)
     files_to_compile.add(file_relative_path)
 
 logger.info("Files to compile: %d", len(files_to_compile))

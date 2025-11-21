@@ -12,7 +12,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-LADYBUG = "ladybug"
+LADYBUG = "Sources/Ladybug"
 REPO_URL = "https://github.com/LadybugDB/ladybug.git"
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 LADYBUG_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, LADYBUG))
