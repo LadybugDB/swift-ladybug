@@ -152,7 +152,7 @@ final class ConnectionTests: XCTestCase {
             #endif
             XCTFail("Expected error")
         } catch let error as LadybugError {
-            XCTAssertTrue(error.message.contains("Parameter b not found"))
+            XCTAssertTrue(error.message.contains("Parameter b not found"), "Actual error message: \(error.message)")
         } catch {
             XCTFail("Unexpected error type")
         }
