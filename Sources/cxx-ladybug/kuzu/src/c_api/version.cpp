@@ -1,7 +1,7 @@
 #include "main/version.h"
 
 #include "c_api/helpers.h"
-#include "c_api/ladybug.h"
+#include "c_api/lbug.h"
 
 char* ladybug_get_version() {
     return convertToOwnedCString(ladybug::main::Version::getVersion());

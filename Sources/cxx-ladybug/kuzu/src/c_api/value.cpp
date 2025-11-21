@@ -1,7 +1,7 @@
 #include "common/types/value/value.h"
 
 #include "c_api/helpers.h"
-#include "c_api/ladybug.h"
+#include "c_api/lbug.h"
 #include "common/constants.h"
 #include "common/types/types.h"
 #include "common/types/value/nested.h"

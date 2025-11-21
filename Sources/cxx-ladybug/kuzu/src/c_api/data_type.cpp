@@ -1,4 +1,4 @@
-#include "c_api/ladybug.h"
+#include "c_api/lbug.h"
 #include "common/types/types.h"
 
 using namespace ladybug::common;

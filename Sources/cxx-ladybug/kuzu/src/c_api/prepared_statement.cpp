@@ -1,7 +1,7 @@
 #include "main/prepared_statement.h"
 
 #include "c_api/helpers.h"
-#include "c_api/ladybug.h"
+#include "c_api/lbug.h"
 #include "common/types/value/value.h"
 
 using namespace ladybug::common;

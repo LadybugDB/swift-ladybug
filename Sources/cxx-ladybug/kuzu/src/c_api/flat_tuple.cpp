@@ -1,7 +1,7 @@
 #include "processor/result/flat_tuple.h"
 
 #include "c_api/helpers.h"
-#include "c_api/ladybug.h"
+#include "c_api/lbug.h"
 #include "common/exception/exception.h"
 
 using namespace ladybug::common;

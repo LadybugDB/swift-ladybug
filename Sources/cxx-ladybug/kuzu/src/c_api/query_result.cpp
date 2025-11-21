@@ -1,7 +1,7 @@
 #include "main/query_result.h"
 
 #include "c_api/helpers.h"
-#include "c_api/ladybug.h"
+#include "c_api/lbug.h"
 
 using namespace ladybug::main;
 using namespace ladybug::common;
