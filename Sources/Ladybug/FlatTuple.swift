@@ -12,28 +12,28 @@ import Foundation
 /// FlatTuple provides access to the values in a query result row and methods to convert them to different formats.
 /// It conforms to `CustomStringConvertible` protocol for easy string representation.
 public final class FlatTuple: CustomStringConvertible, @unchecked Sendable {
-    internal var cFlatTuple: ladybug_flat_tuple
+    internal var cFlatTuple: lbug_flat_tuple
     internal var queryResult: QueryResult
 
     internal init(
         _ queryResult: QueryResult,
-        _ cFlatTuple: ladybug_flat_tuple
+        _ cFlatTuple: lbug_flat_tuple
     ) {
         self.cFlatTuple = cFlatTuple
         self.queryResult = queryResult
     }
 
     deinit {
-        ladybug_flat_tuple_destroy(&cFlatTuple)
+        lbug_flat_tuple_destroy(&cFlatTuple)
     }
 
     /// Returns the string representation of the FlatTuple.
     /// The string representation contains the values of the tuple separated by vertical bars.
     public var description: String {
-        let cString: UnsafeMutablePointer<CChar> = ladybug_flat_tuple_to_string(
+        let cString: UnsafeMutablePointer<CChar> = lbug_flat_tuple_to_string(
             &cFlatTuple
         )
-        defer { ladybug_destroy_string(cString) }
+        defer { lbug_destroy_string(cString) }
         return String(cString: cString)
     }
 
@@ -42,14 +42,14 @@ public final class FlatTuple: CustomStringConvertible, @unchecked Sendable {
     /// - Returns: The value at the specified index, or nil if the value is null.
     /// - Throws: `LadybugError.getValueFailed` if retrieving the value fails.
     public func getValue(_ index: UInt64) throws -> Any? {
-        var cValue = ladybug_value()
-        let state = ladybug_flat_tuple_get_value(&cFlatTuple, index, &cValue)
-        if state != LadybugSuccess {
+        var cValue = lbug_value()
+        let state = lbug_flat_tuple_get_value(&cFlatTuple, index, &cValue)
+        if state != LbugSuccess {
             throw LadybugError.getValueFailed(
                 "Get value failed with error code: \(state)"
             )
         }
-        defer { ladybug_value_destroy(&cValue) }
+        defer { lbug_value_destroy(&cValue) }
         return try ladybugValueToSwift(&cValue)
     }
 

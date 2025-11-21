@@ -10,7 +10,7 @@ import Foundation
 
 /// A class representing a Ladybug database instance.
 public final class Database: @unchecked Sendable {
-    internal var cDatabase: ladybug_database
+    internal var cDatabase: lbug_database
 
     /// Initializes a new Ladybug database instance.
     /// - Parameters:
@@ -21,15 +21,15 @@ public final class Database: @unchecked Sendable {
         _ databasePath: String = ":memory:",
         _ systemConfig: SystemConfig? = nil
     ) throws {
-        cDatabase = ladybug_database()
+        cDatabase = lbug_database()
         let cSystemConfg =
-            systemConfig?.cSystemConfig ?? ladybug_default_system_config()
-        let state = ladybug_database_init(
+            systemConfig?.cSystemConfig ?? lbug_default_system_config()
+        let state = lbug_database_init(
             databasePath,
             cSystemConfg,
             &self.cDatabase
         )
-        if state == LadybugSuccess {
+        if state == LbugSuccess {
             return
         } else {
             throw LadybugError.databaseInitializationFailed(
@@ -43,8 +43,8 @@ public final class Database: @unchecked Sendable {
     /// This property returns the version of the underlying Ladybug library.
     /// Useful for debugging and ensuring compatibility.
     public static var version: String {
-        let resultCString = ladybug_get_version()
-        defer { ladybug_destroy_string(resultCString) }
+        let resultCString = lbug_get_version()
+        defer { lbug_destroy_string(resultCString) }
         return String(cString: resultCString!)
     }
 
@@ -53,11 +53,11 @@ public final class Database: @unchecked Sendable {
     /// This property returns the storage format version used by the Ladybug library.
     /// It can be used to check compatibility of database files.
     public static var storageVersion: UInt64 {
-        let storageVersion = ladybug_get_storage_version()
+        let storageVersion = lbug_get_storage_version()
         return storageVersion
     }
 
     deinit {
-        ladybug_database_destroy(&self.cDatabase)
+        lbug_database_destroy(&self.cDatabase)
     }
 }
