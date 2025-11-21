@@ -48,7 +48,7 @@ jobs:
       - name: Build for iOS Simulator
         run: |
           xcodebuild build-for-testing \
-            -scheme kuzu-swift \
+            -scheme swift-ladybug \
             -destination "${{ matrix.destination }}" \
             -configuration ${{ matrix.config }} \
             ENABLE_TESTABILITY=YES \
@@ -57,7 +57,7 @@ jobs:
       - name: Test on iOS Simulator
         run: |
           xcodebuild test-without-building \
-            -scheme kuzu-swift \
+            -scheme swift-ladybug \
             -destination "${{ matrix.destination }}" \
             -configuration ${{ matrix.config }} \
             ENABLE_TESTABILITY=YES \
@@ -78,8 +78,8 @@ jobs:
           mv Package.swift.tmp Package.swift
           swift build -c release
           # Copy the built binary to the current directory
-          cp ./.build/arm64-apple-macosx/release/kuzu-swift-example .
+          cp ./.build/arm64-apple-macosx/release/swift-ladybug-example .
  
       - name: Run example
         working-directory: Example
-        run: ./kuzu-swift-example
+        run: ./swift-ladybug-example

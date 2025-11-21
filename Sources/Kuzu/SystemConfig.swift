@@ -1,19 +1,19 @@
 //
-//  kuzu-swift
-//  https://github.com/kuzudb/kuzu-swift
+//  swift-ladybug
+//  https://github.com/LadybugDB/swift-ladybug
 //
 //  Copyright © 2023 - 2025 Kùzu Inc.
 //  This code is licensed under MIT license (see LICENSE for details)
 
 import Foundation
-@_implementationOnly import cxx_kuzu
+@_implementationOnly import cxx_ladybug
 
 /// Represents the configuration of Kuzu database system.
 ///
 /// The configuration includes settings for buffer pool size, thread management,
 /// compression, read-only mode, and database size limits.
 public final class SystemConfig: @unchecked Sendable {
-    internal var cSystemConfig: kuzu_system_config
+    internal var cSystemConfig: ladybug_system_config
 
     /// Creates a new system configuration with default values.
     ///
@@ -24,7 +24,7 @@ public final class SystemConfig: @unchecked Sendable {
     /// - readOnly: false
     /// - threadQos: QOS_CLASS_DEFAULT (Apple platforms only)
     public init() {
-        cSystemConfig = kuzu_default_system_config()
+        cSystemConfig = ladybug_default_system_config()
         #if os(iOS)
             cSystemConfig.buffer_pool_size = 2048 * 1024 * 1024
         #endif

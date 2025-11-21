@@ -1,12 +1,12 @@
 //
-//  kuzu-swift
-//  https://github.com/kuzudb/kuzu-swift
+//  swift-ladybug
+//  https://github.com/LadybugDB/swift-ladybug
 //
 //  Copyright © 2023 - 2025 Kùzu Inc.
 //  This code is licensed under MIT license (see LICENSE for details)
 
 import Foundation
-@_implementationOnly import cxx_kuzu
+@_implementationOnly import cxx_ladybug
 
 /// Constants for time unit conversions
 private let MILLISECONDS_IN_A_SECOND: Double = 1_000
@@ -27,26 +27,26 @@ private let SECONDS_IN_A_MONTH = DAYS_IN_A_MONTH * SECONDS_IN_A_DAY
 /// Converts a Swift Date to a Kuzu timestamp.
 /// - Parameter date: The Swift Date to convert.
 /// - Returns: A Kuzu timestamp representing the same time.
-private func swiftDateToKuzuTimestamp(_ date: Date) -> kuzu_timestamp_t {
+private func swiftDateToKuzuTimestamp(_ date: Date) -> ladybug_timestamp_t {
     let timeInterval = date.timeIntervalSince1970
     let microseconds = timeInterval * MICROSECONDS_IN_A_SECOND
-    return kuzu_timestamp_t(value: Int64(microseconds))
+    return ladybug_timestamp_t(value: Int64(microseconds))
 }
 
 /// Converts a Swift TimeInterval to a Kuzu interval.
 /// - Parameter timeInterval: The Swift TimeInterval to convert.
 /// - Returns: A Kuzu interval representing the same duration.
 private func swiftTimeIntervalToKuzuInterval(_ timeInterval: TimeInterval)
-    -> kuzu_interval_t
+    -> ladybug_interval_t
 {
     let microseconds = timeInterval * MICROSECONDS_IN_A_SECOND
-    return kuzu_interval_t(months: 0, days: 0, micros: Int64(microseconds))
+    return ladybug_interval_t(months: 0, days: 0, micros: Int64(microseconds))
 }
 
 /// Converts a Kuzu interval to a Swift TimeInterval.
 /// - Parameter interval: The Kuzu interval to convert.
 /// - Returns: A Swift TimeInterval representing the same duration.
-private func kuzuIntervalToSwiftTimeInterval(_ interval: kuzu_interval_t)
+private func ladybugIntervalToSwiftTimeInterval(_ interval: ladybug_interval_t)
     -> TimeInterval
 {
     var seconds = Double(interval.micros) / MICROSECONDS_IN_A_SECOND
@@ -60,7 +60,7 @@ private func kuzuIntervalToSwiftTimeInterval(_ interval: kuzu_interval_t)
 /// - Returns: A Kuzu map value.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
 private func swiftArrayOfMapItemsToKuzuMap(_ array: [(Any?, Any?)]) throws
-    -> UnsafeMutablePointer<kuzu_value>
+    -> UnsafeMutablePointer<ladybug_value>
 {
     let numItems = array.count
     if numItems == 0 {
@@ -68,9 +68,9 @@ private func swiftArrayOfMapItemsToKuzuMap(_ array: [(Any?, Any?)]) throws
             "Cannot convert empty array to Kuzu MAP"
         )
     }
-    let keys: UnsafeMutablePointer<UnsafeMutablePointer<kuzu_value>?> =
+    let keys: UnsafeMutablePointer<UnsafeMutablePointer<ladybug_value>?> =
         .allocate(capacity: numItems)
-    let values: UnsafeMutablePointer<UnsafeMutablePointer<kuzu_value>?> =
+    let values: UnsafeMutablePointer<UnsafeMutablePointer<ladybug_value>?> =
         .allocate(capacity: numItems)
     for idx in 0..<numItems {
         keys[idx] = nil
@@ -78,8 +78,8 @@ private func swiftArrayOfMapItemsToKuzuMap(_ array: [(Any?, Any?)]) throws
     }
     defer {
         for idx in 0..<numItems {
-            kuzu_value_destroy(keys[idx])
-            kuzu_value_destroy(values[idx])
+            ladybug_value_destroy(keys[idx])
+            ladybug_value_destroy(values[idx])
         }
         keys.deallocate()
         values.deallocate()
@@ -90,8 +90,8 @@ private func swiftArrayOfMapItemsToKuzuMap(_ array: [(Any?, Any?)]) throws
         keys[idx] = key
         values[idx] = value
     }
-    var valuePtr: UnsafeMutablePointer<kuzu_value>?
-    let state = kuzu_value_create_map(UInt64(numItems), keys, values, &valuePtr)
+    var valuePtr: UnsafeMutablePointer<ladybug_value>?
+    let state = ladybug_value_create_map(UInt64(numItems), keys, values, &valuePtr)
     if state != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to create MAP value with status: \(state). Please make sure all the keys are of the same type and all the values are of the same type."
@@ -104,37 +104,37 @@ private func swiftArrayOfMapItemsToKuzuMap(_ array: [(Any?, Any?)]) throws
 /// - Parameter cValue: The Kuzu map value to convert.
 /// - Returns: An array of tuples containing key-value pairs.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
-private func kuzuMapToSwiftArrayOfMapItems(_ cValue: inout kuzu_value) throws
+private func ladybugMapToSwiftArrayOfMapItems(_ cValue: inout ladybug_value) throws
     -> [(Any?, Any?)]
 {
     var mapSize: UInt64 = 0
-    let state = kuzu_value_get_map_size(&cValue, &mapSize)
+    let state = ladybug_value_get_map_size(&cValue, &mapSize)
     if state != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get map size with status: \(state)"
         )
     }
     var result: [(Any?, Any?)] = []
-    var currentKey = kuzu_value()
-    var currentValue = kuzu_value()
+    var currentKey = ladybug_value()
+    var currentValue = ladybug_value()
     for i in UInt64(0)..<mapSize {
-        let keyState = kuzu_value_get_map_key(&cValue, i, &currentKey)
+        let keyState = ladybug_value_get_map_key(&cValue, i, &currentKey)
         if keyState != KuzuSuccess {
             throw KuzuError.valueConversionFailed(
                 "Failed to get map key with status: \(keyState)"
             )
         }
-        defer { kuzu_value_destroy(&currentKey) }
-        let valueState = kuzu_value_get_map_value(&cValue, i, &currentValue)
+        defer { ladybug_value_destroy(&currentKey) }
+        let valueState = ladybug_value_get_map_value(&cValue, i, &currentValue)
         if valueState != KuzuSuccess {
-            kuzu_value_destroy(&currentKey)
+            ladybug_value_destroy(&currentKey)
             throw KuzuError.valueConversionFailed(
                 "Failed to get map value with status: \(valueState)"
             )
         }
-        defer { kuzu_value_destroy(&currentValue) }
-        let key = try kuzuValueToSwift(&currentKey)
-        let value = try kuzuValueToSwift(&currentValue)
+        defer { ladybug_value_destroy(&currentValue) }
+        let key = try ladybugValueToSwift(&currentKey)
+        let value = try ladybugValueToSwift(&currentValue)
         result.append((key, value))
     }
 
@@ -146,7 +146,7 @@ private func kuzuMapToSwiftArrayOfMapItems(_ cValue: inout kuzu_value) throws
 /// - Returns: A Kuzu list value.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
 private func swiftArrayToKuzuList(_ array: NSArray)
-    throws -> UnsafeMutablePointer<kuzu_value>
+    throws -> UnsafeMutablePointer<ladybug_value>
 {
     let numberOfElements = array.count
     if numberOfElements == 0 {
@@ -154,14 +154,14 @@ private func swiftArrayToKuzuList(_ array: NSArray)
             "Cannot convert empty array to Kuzu list"
         )
     }
-    let cElementArray: UnsafeMutablePointer<UnsafeMutablePointer<kuzu_value>?> =
+    let cElementArray: UnsafeMutablePointer<UnsafeMutablePointer<ladybug_value>?> =
         .allocate(capacity: numberOfElements)
     for idx in 0..<numberOfElements {
         cElementArray[idx] = nil
     }
     defer {
         for idx in 0..<numberOfElements {
-            kuzu_value_destroy(cElementArray[idx])
+            ladybug_value_destroy(cElementArray[idx])
         }
         cElementArray.deallocate()
     }
@@ -169,8 +169,8 @@ private func swiftArrayToKuzuList(_ array: NSArray)
         let cElement = try swiftValueToKuzuValue(element)
         cElementArray[idx] = cElement
     }
-    var cKuzuListValue: UnsafeMutablePointer<kuzu_value>?
-    let state = kuzu_value_create_list(
+    var cKuzuListValue: UnsafeMutablePointer<ladybug_value>?
+    let state = ladybug_value_create_list(
         UInt64(numberOfElements),
         cElementArray,
         &cKuzuListValue
@@ -187,15 +187,15 @@ private func swiftArrayToKuzuList(_ array: NSArray)
 /// - Parameter cValue: The Kuzu list value to convert.
 /// - Returns: A Swift array containing the list elements.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
-private func kuzuListToSwiftArray(_ cValue: inout kuzu_value) throws -> [Any?] {
+private func ladybugListToSwiftArray(_ cValue: inout ladybug_value) throws -> [Any?] {
     var numElements: UInt64 = 0
-    var logicalType = kuzu_logical_type()
-    kuzu_value_get_data_type(&cValue, &logicalType)
+    var logicalType = ladybug_logical_type()
+    ladybug_value_get_data_type(&cValue, &logicalType)
 
-    defer { kuzu_data_type_destroy(&logicalType) }
-    let logicalTypeId = kuzu_data_type_get_id(&logicalType)
+    defer { ladybug_data_type_destroy(&logicalType) }
+    let logicalTypeId = ladybug_data_type_get_id(&logicalType)
     if logicalTypeId == KUZU_ARRAY {
-        let state = kuzu_data_type_get_num_elements_in_array(
+        let state = ladybug_data_type_get_num_elements_in_array(
             &logicalType,
             &numElements
         )
@@ -205,7 +205,7 @@ private func kuzuListToSwiftArray(_ cValue: inout kuzu_value) throws -> [Any?] {
             )
         }
     } else {
-        let state = kuzu_value_get_list_size(&cValue, &numElements)
+        let state = ladybug_value_get_list_size(&cValue, &numElements)
         if state != KuzuSuccess {
             throw KuzuError.valueConversionFailed(
                 "Failed to get number of elements in list with status: \(state)"
@@ -213,16 +213,16 @@ private func kuzuListToSwiftArray(_ cValue: inout kuzu_value) throws -> [Any?] {
         }
     }
     var result: [Any?] = []
-    var currentValue = kuzu_value()
+    var currentValue = ladybug_value()
     for i in UInt64(0)..<numElements {
-        let state = kuzu_value_get_list_element(&cValue, i, &currentValue)
+        let state = ladybug_value_get_list_element(&cValue, i, &currentValue)
         if state != KuzuSuccess {
             throw KuzuError.valueConversionFailed(
                 "Failed to get list element with status: \(state)"
             )
         }
-        defer { kuzu_value_destroy(&currentValue) }
-        let swiftValue = try kuzuValueToSwift(&currentValue)
+        defer { ladybug_value_destroy(&currentValue) }
+        let swiftValue = try ladybugValueToSwift(&currentValue)
         result.append(swiftValue)
     }
     return result
@@ -233,7 +233,7 @@ private func kuzuListToSwiftArray(_ cValue: inout kuzu_value) throws -> [Any?] {
 /// - Returns: A Kuzu struct value.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
 private func swiftDictionaryToKuzuStruct(_ dictionary: NSDictionary)
-    throws -> UnsafeMutablePointer<kuzu_value>
+    throws -> UnsafeMutablePointer<ladybug_value>
 {
     let numFields = UInt64(dictionary.count)
     if numFields == 0 {
@@ -241,10 +241,10 @@ private func swiftDictionaryToKuzuStruct(_ dictionary: NSDictionary)
             "Cannot convert empty map to Kuzu struct"
         )
     }
-    var stringKeyMap: [String: UnsafeMutablePointer<kuzu_value>?] = [:]
+    var stringKeyMap: [String: UnsafeMutablePointer<ladybug_value>?] = [:]
     defer {
         for (_, cValue) in stringKeyMap {
-            kuzu_value_destroy(cValue)
+            ladybug_value_destroy(cValue)
         }
     }
     for key in dictionary.allKeys {
@@ -264,7 +264,7 @@ private func swiftDictionaryToKuzuStruct(_ dictionary: NSDictionary)
     var mutableSortedCStrings: [UnsafeMutablePointer<CChar>?] = []
     let sortedKeysCStrings: UnsafeMutablePointer<UnsafePointer<CChar>?> =
         .allocate(capacity: sortedKeys.count)
-    let sortedValues: UnsafeMutablePointer<UnsafeMutablePointer<kuzu_value>?> =
+    let sortedValues: UnsafeMutablePointer<UnsafeMutablePointer<ladybug_value>?> =
         .allocate(capacity: sortedKeys.count)
 
     for idx in 0..<sortedKeys.count {
@@ -282,8 +282,8 @@ private func swiftDictionaryToKuzuStruct(_ dictionary: NSDictionary)
         sortedValues.deallocate()
     }
 
-    var cStructValue: UnsafeMutablePointer<kuzu_value>?
-    kuzu_value_create_struct(
+    var cStructValue: UnsafeMutablePointer<ladybug_value>?
+    ladybug_value_create_struct(
         numFields,
         sortedKeysCStrings,
         sortedValues,
@@ -296,35 +296,35 @@ private func swiftDictionaryToKuzuStruct(_ dictionary: NSDictionary)
 /// - Parameter cValue: The Kuzu struct value to convert.
 /// - Returns: A Swift dictionary containing the struct fields.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
-private func kuzuStructValueToSwiftDictionary(_ cValue: inout kuzu_value) throws
+private func ladybugStructValueToSwiftDictionary(_ cValue: inout ladybug_value) throws
     -> [String: Any?]
 {
     var dict: [String: Any?] = [:]
     var propertySize: UInt64 = 0
-    kuzu_value_get_struct_num_fields(&cValue, &propertySize)
+    ladybug_value_get_struct_num_fields(&cValue, &propertySize)
     var currentKey: UnsafeMutablePointer<CChar>?
-    var currentValue = kuzu_value()
+    var currentValue = ladybug_value()
     for i in UInt64(0)..<propertySize {
-        var state = kuzu_value_get_struct_field_name(&cValue, i, &currentKey)
+        var state = ladybug_value_get_struct_field_name(&cValue, i, &currentKey)
         if state != KuzuSuccess {
             throw KuzuError.valueConversionFailed(
                 "Failed to get struct field name with status: \(state)"
             )
         }
         defer {
-            kuzu_destroy_string(currentKey)
+            ladybug_destroy_string(currentKey)
         }
         let key = String(cString: currentKey!)
-        state = kuzu_value_get_struct_field_value(&cValue, i, &currentValue)
+        state = ladybug_value_get_struct_field_value(&cValue, i, &currentValue)
         if state != KuzuSuccess {
             throw KuzuError.valueConversionFailed(
                 "Failed to get struct field with status: \(state)"
             )
         }
         defer {
-            kuzu_value_destroy(&currentValue)
+            ladybug_value_destroy(&currentValue)
         }
-        let swiftValue = try kuzuValueToSwift(&currentValue)
+        let swiftValue = try ladybugValueToSwift(&currentValue)
         dict[key] = swiftValue
     }
     return dict
@@ -334,51 +334,51 @@ private func kuzuStructValueToSwiftDictionary(_ cValue: inout kuzu_value) throws
 /// - Parameter cValue: The Kuzu union value to convert.
 /// - Returns: A Swift value.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
-private func kuzuUnionValueToSwiftValue(_ cValue: inout kuzu_value) throws
+private func ladybugUnionValueToSwiftValue(_ cValue: inout ladybug_value) throws
     -> Any?
 {
-    var unionValue = kuzu_value()
+    var unionValue = ladybug_value()
     // Only one member in the union can be active at a time and that member is always stored
     // at index 0.
-    let state = kuzu_value_get_struct_field_value(&cValue, 0, &unionValue)
+    let state = ladybug_value_get_struct_field_value(&cValue, 0, &unionValue)
     if state != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get union value with status: \(state)"
         )
     }
-    defer { kuzu_value_destroy(&unionValue) }
-    return try kuzuValueToSwift(&unionValue)
+    defer { ladybug_value_destroy(&unionValue) }
+    return try ladybugValueToSwift(&unionValue)
 }
 
 /// Converts a Kuzu node value to a Swift KuzuNode.
 /// - Parameter cValue: The Kuzu node value to convert.
 /// - Returns: A Swift KuzuNode.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
-private func kuzuNodeValueToSwiftNode(_ cValue: inout kuzu_value) throws
+private func ladybugNodeValueToSwiftNode(_ cValue: inout ladybug_value) throws
     -> KuzuNode
 {
-    var idValue = kuzu_value()
-    let idState = kuzu_node_val_get_id_val(&cValue, &idValue)
+    var idValue = ladybug_value()
+    let idState = ladybug_node_val_get_id_val(&cValue, &idValue)
     if idState != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get node ID with status: \(idState)"
         )
     }
-    defer { kuzu_value_destroy(&idValue) }
-    let id = try kuzuValueToSwift(&idValue) as! KuzuInternalId
+    defer { ladybug_value_destroy(&idValue) }
+    let id = try ladybugValueToSwift(&idValue) as! KuzuInternalId
 
-    var labelValue = kuzu_value()
-    let labelState = kuzu_node_val_get_label_val(&cValue, &labelValue)
+    var labelValue = ladybug_value()
+    let labelState = ladybug_node_val_get_label_val(&cValue, &labelValue)
     if labelState != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get node label with status: \(labelState)"
         )
     }
-    defer { kuzu_value_destroy(&labelValue) }
-    let label = try kuzuValueToSwift(&labelValue) as! String
+    defer { ladybug_value_destroy(&labelValue) }
+    let label = try ladybugValueToSwift(&labelValue) as! String
 
     var propertySize: UInt64 = 0
-    let propertySizeState = kuzu_node_val_get_property_size(
+    let propertySizeState = ladybug_node_val_get_property_size(
         &cValue,
         &propertySize
     )
@@ -390,10 +390,10 @@ private func kuzuNodeValueToSwiftNode(_ cValue: inout kuzu_value) throws
 
     var properties: [String: Any?] = [:]
     var currentKey: UnsafeMutablePointer<CChar>?
-    var currentValue = kuzu_value()
+    var currentValue = ladybug_value()
 
     for i in UInt64(0)..<propertySize {
-        let keyState = kuzu_node_val_get_property_name_at(
+        let keyState = ladybug_node_val_get_property_name_at(
             &cValue,
             i,
             &currentKey
@@ -403,10 +403,10 @@ private func kuzuNodeValueToSwiftNode(_ cValue: inout kuzu_value) throws
                 "Failed to get property name with status: \(keyState)"
             )
         }
-        defer { kuzu_destroy_string(currentKey) }
+        defer { ladybug_destroy_string(currentKey) }
         let key = String(cString: currentKey!)
 
-        let valueState = kuzu_node_val_get_property_value_at(
+        let valueState = ladybug_node_val_get_property_value_at(
             &cValue,
             i,
             &currentValue
@@ -416,9 +416,9 @@ private func kuzuNodeValueToSwiftNode(_ cValue: inout kuzu_value) throws
                 "Failed to get property value with status: \(valueState)"
             )
         }
-        defer { kuzu_value_destroy(&currentValue) }
+        defer { ladybug_value_destroy(&currentValue) }
 
-        let value = try kuzuValueToSwift(&currentValue)
+        let value = try ladybugValueToSwift(&currentValue)
         properties[key] = value
     }
 
@@ -429,52 +429,52 @@ private func kuzuNodeValueToSwiftNode(_ cValue: inout kuzu_value) throws
 /// - Parameter cValue: The Kuzu relationship value to convert.
 /// - Returns: A Swift KuzuRelationship.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
-private func kuzuRelValueToSwiftRelationship(_ cValue: inout kuzu_value) throws
+private func ladybugRelValueToSwiftRelationship(_ cValue: inout ladybug_value) throws
     -> KuzuRelationship
 {
-    var idValue = kuzu_value()
+    var idValue = ladybug_value()
     
-    let idState = kuzu_rel_val_get_id_val(&cValue, &idValue)
+    let idState = ladybug_rel_val_get_id_val(&cValue, &idValue)
     if idState != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get relationship ID with status: \(idState)"
         )
     }
-    let id = try kuzuValueToSwift(&idValue) as! KuzuInternalId
-    kuzu_value_destroy(&idValue)
+    let id = try ladybugValueToSwift(&idValue) as! KuzuInternalId
+    ladybug_value_destroy(&idValue)
 
-    let srcState = kuzu_rel_val_get_src_id_val(&cValue, &idValue)
+    let srcState = ladybug_rel_val_get_src_id_val(&cValue, &idValue)
     if srcState != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get relationship source ID with status: \(srcState)"
         )
     }
-    let sourceId = try kuzuValueToSwift(&idValue) as! KuzuInternalId
-    kuzu_value_destroy(&idValue)
+    let sourceId = try ladybugValueToSwift(&idValue) as! KuzuInternalId
+    ladybug_value_destroy(&idValue)
 
-    let dstState = kuzu_rel_val_get_dst_id_val(&cValue, &idValue)
+    let dstState = ladybug_rel_val_get_dst_id_val(&cValue, &idValue)
     if dstState != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get relationship target ID with status: \(dstState)"
         )
     }
-    let targetId = try kuzuValueToSwift(&idValue) as! KuzuInternalId
-    kuzu_value_destroy(&idValue)
+    let targetId = try ladybugValueToSwift(&idValue) as! KuzuInternalId
+    ladybug_value_destroy(&idValue)
 
-    var labelValue = kuzu_value()
-    let labelState = kuzu_rel_val_get_label_val(&cValue, &labelValue)
+    var labelValue = ladybug_value()
+    let labelState = ladybug_rel_val_get_label_val(&cValue, &labelValue)
     if labelState != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get relationship label with status: \(labelState)"
         )
     }
-    let label = try kuzuValueToSwift(&labelValue) as! String
+    let label = try ladybugValueToSwift(&labelValue) as! String
 
-    kuzu_value_destroy(&labelValue)
+    ladybug_value_destroy(&labelValue)
 
     // Get Properties
     var propertySize: UInt64 = 0
-    let propertySizeState = kuzu_rel_val_get_property_size(
+    let propertySizeState = ladybug_rel_val_get_property_size(
         &cValue,
         &propertySize
     )
@@ -486,10 +486,10 @@ private func kuzuRelValueToSwiftRelationship(_ cValue: inout kuzu_value) throws
 
     var properties: [String: Any?] = [:]
     var currentKey: UnsafeMutablePointer<CChar>?
-    var currentValue = kuzu_value()
+    var currentValue = ladybug_value()
 
     for i in UInt64(0)..<propertySize {
-        let keyState = kuzu_rel_val_get_property_name_at(
+        let keyState = ladybug_rel_val_get_property_name_at(
             &cValue,
             i,
             &currentKey
@@ -499,10 +499,10 @@ private func kuzuRelValueToSwiftRelationship(_ cValue: inout kuzu_value) throws
                 "Failed to get property name with status: \(keyState)"
             )
         }
-        defer { kuzu_destroy_string(currentKey) }
+        defer { ladybug_destroy_string(currentKey) }
         let key = String(cString: currentKey!)
 
-        let valueState = kuzu_rel_val_get_property_value_at(
+        let valueState = ladybug_rel_val_get_property_value_at(
             &cValue,
             i,
             &currentValue
@@ -512,9 +512,9 @@ private func kuzuRelValueToSwiftRelationship(_ cValue: inout kuzu_value) throws
                 "Failed to get property value with status: \(valueState)"
             )
         }
-        defer { kuzu_value_destroy(&currentValue) }
+        defer { ladybug_value_destroy(&currentValue) }
 
-        let value = try kuzuValueToSwift(&currentValue)
+        let value = try ladybugValueToSwift(&currentValue)
         properties[key] = value
     }
 
@@ -531,13 +531,13 @@ private func kuzuRelValueToSwiftRelationship(_ cValue: inout kuzu_value) throws
 /// - Parameter cValue: The Kuzu recursive relationship value to convert.
 /// - Returns: A Swift KuzuRecursiveRelationship.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
-private func kuzuRecursiveRelValueToSwiftRecursiveRelationship(
-    _ cValue: inout kuzu_value
+private func ladybugRecursiveRelValueToSwiftRecursiveRelationship(
+    _ cValue: inout ladybug_value
 ) throws
     -> KuzuRecursiveRelationship
 {
-    var nodesValue = kuzu_value()
-    let nodesState = kuzu_value_get_recursive_rel_node_list(
+    var nodesValue = ladybug_value()
+    let nodesState = ladybug_value_get_recursive_rel_node_list(
         &cValue,
         &nodesValue
     )
@@ -546,38 +546,38 @@ private func kuzuRecursiveRelValueToSwiftRecursiveRelationship(
             "Failed to get recursive relationship nodes with status: \(nodesState)"
         )
     }
-    defer { kuzu_value_destroy(&nodesValue) }
+    defer { ladybug_value_destroy(&nodesValue) }
 
-    var relsValue = kuzu_value()
-    let relsState = kuzu_value_get_recursive_rel_rel_list(&cValue, &relsValue)
+    var relsValue = ladybug_value()
+    let relsState = ladybug_value_get_recursive_rel_rel_list(&cValue, &relsValue)
     if relsState != KuzuSuccess {
         throw KuzuError.valueConversionFailed(
             "Failed to get recursive relationship relationships with status: \(relsState)"
         )
     }
-    defer { kuzu_value_destroy(&relsValue) }
+    defer { ladybug_value_destroy(&relsValue) }
 
-    let nodesArray = try kuzuListToSwiftArray(&nodesValue)
-    let relsArray = try kuzuListToSwiftArray(&relsValue)
+    let nodesArray = try ladybugListToSwiftArray(&nodesValue)
+    let relsArray = try ladybugListToSwiftArray(&relsValue)
 
     var nodes: [KuzuNode] = []
     for node in nodesArray {
-        guard let kuzuNode = node as? KuzuNode else {
+        guard let ladybugNode = node as? KuzuNode else {
             throw KuzuError.valueConversionFailed(
                 "Failed to convert node to KuzuNode"
             )
         }
-        nodes.append(kuzuNode)
+        nodes.append(ladybugNode)
     }
 
     var relationships: [KuzuRelationship] = []
     for rel in relsArray {
-        guard let kuzuRel = rel as? KuzuRelationship else {
+        guard let ladybugRel = rel as? KuzuRelationship else {
             throw KuzuError.valueConversionFailed(
                 "Failed to convert relationship to KuzuRelationship"
             )
         }
-        relationships.append(kuzuRel)
+        relationships.append(ladybugRel)
     }
 
     return KuzuRecursiveRelationship(nodes: nodes, relationships: relationships)
@@ -588,12 +588,12 @@ private func kuzuRecursiveRelValueToSwiftRecursiveRelationship(
 /// - Returns: A Kuzu value.
 /// - Throws: `KuzuError.valueConversionFailed` if the conversion fails.
 internal func swiftValueToKuzuValue(_ value: Any?)
-    throws -> UnsafeMutablePointer<kuzu_value>
+    throws -> UnsafeMutablePointer<ladybug_value>
 {
     if value == nil {
-        return kuzu_value_create_null()
+        return ladybug_value_create_null()
     }
-    var valuePtr: UnsafeMutablePointer<kuzu_value>
+    var valuePtr: UnsafeMutablePointer<ladybug_value>
     let dtype = Mirror(reflecting: value!).subjectType
     if let number = value as? NSNumber {
         #if os(Linux)
@@ -611,33 +611,33 @@ internal func swiftValueToKuzuValue(_ value: Any?)
                 // Boolean is encoded as char in Swift / Objective-C.
                 valuePtr =
                     CFGetTypeID(number) == CFBooleanGetTypeID()
-                    ? kuzu_value_create_bool(number as! Bool)
-                    : kuzu_value_create_int8(number as! Int8)
+                    ? ladybug_value_create_bool(number as! Bool)
+                    : ladybug_value_create_int8(number as! Int8)
             case "i":
-                valuePtr = kuzu_value_create_int32(number as! Int32)
+                valuePtr = ladybug_value_create_int32(number as! Int32)
             case "s":
-                valuePtr = kuzu_value_create_int16(number as! Int16)
+                valuePtr = ladybug_value_create_int16(number as! Int16)
             case "l":
-                valuePtr = kuzu_value_create_int32(number as! Int32)
+                valuePtr = ladybug_value_create_int32(number as! Int32)
             case "q":
-                valuePtr = kuzu_value_create_int64(number as! Int64)
+                valuePtr = ladybug_value_create_int64(number as! Int64)
             //        Internally Swift does not seem to really use these UInt
             //        type representations, so we use the `KuzuUIntWrapper`
             //        structs as a workaround.
             //        case "C":
-            //            valuePtr = kuzu_value_create_uint8(number as! UInt8)
+            //            valuePtr = ladybug_value_create_uint8(number as! UInt8)
             //        case "I":
-            //            valuePtr = kuzu_value_create_uint32(number as! UInt32)
+            //            valuePtr = ladybug_value_create_uint32(number as! UInt32)
             //        case "S":
-            //            valuePtr = kuzu_value_create_uint16(number as! UInt16)
+            //            valuePtr = ladybug_value_create_uint16(number as! UInt16)
             //        case "L":
-            //            valuePtr = kuzu_value_create_uint32(number as! UInt32)
+            //            valuePtr = ladybug_value_create_uint32(number as! UInt32)
             case "Q":
-                valuePtr = kuzu_value_create_uint64(number as! UInt64)
+                valuePtr = ladybug_value_create_uint64(number as! UInt64)
             case "f":
-                valuePtr = kuzu_value_create_float(number as! Float32)
+                valuePtr = ladybug_value_create_float(number as! Float32)
             case "d":
-                valuePtr = kuzu_value_create_double(number as! Double)
+                valuePtr = ladybug_value_create_double(number as! Double)
             default:
                 throw KuzuError.valueConversionFailed(
                     "Unsupported numeric type with encoding: \(objCType)"
@@ -646,36 +646,36 @@ internal func swiftValueToKuzuValue(_ value: Any?)
         #endif
     } else {
         switch value! {
-        case let kuzuUint64 as KuzuUInt64Wrapper:
-            valuePtr = kuzu_value_create_uint64(UInt64(kuzuUint64.value))
-        case let kuzuUint32 as KuzuUInt32Wrapper:
-            valuePtr = kuzu_value_create_uint32(UInt32(kuzuUint32.value))
-        case let kuzuUint16 as KuzuUInt16Wrapper:
-            valuePtr = kuzu_value_create_uint16(UInt16(kuzuUint16.value))
-        case let kuzuUint8 as KuzuUInt8Wrapper:
-            valuePtr = kuzu_value_create_uint8(UInt8(kuzuUint8.value))
-        case let kuzuInt64 as KuzuInt64Wrapper:
-            valuePtr = kuzu_value_create_int64(Int64(kuzuInt64.value))
-        case let kuzuInt32 as KuzuInt32Wrapper:
-            valuePtr = kuzu_value_create_int32(Int32(kuzuInt32.value))
-        case let kuzuInt16 as KuzuInt16Wrapper:
-            valuePtr = kuzu_value_create_int16(Int16(kuzuInt16.value))
-        case let kuzuInt8 as KuzuInt8Wrapper:
-            valuePtr = kuzu_value_create_int8(Int8(kuzuInt8.value))
-        case let kuzuFloat as KuzuFloatWrapper:
-            valuePtr = kuzu_value_create_float(Float(kuzuFloat.value))
-        case let kuzuDouble as KuzuDoubleWrapper:
-            valuePtr = kuzu_value_create_double(Double(kuzuDouble.value))
-        case let kuzuBool as KuzuBoolWrapper:
-            valuePtr = kuzu_value_create_bool(kuzuBool.value)
+        case let ladybugUint64 as KuzuUInt64Wrapper:
+            valuePtr = ladybug_value_create_uint64(UInt64(ladybugUint64.value))
+        case let ladybugUint32 as KuzuUInt32Wrapper:
+            valuePtr = ladybug_value_create_uint32(UInt32(ladybugUint32.value))
+        case let ladybugUint16 as KuzuUInt16Wrapper:
+            valuePtr = ladybug_value_create_uint16(UInt16(ladybugUint16.value))
+        case let ladybugUint8 as KuzuUInt8Wrapper:
+            valuePtr = ladybug_value_create_uint8(UInt8(ladybugUint8.value))
+        case let ladybugInt64 as KuzuInt64Wrapper:
+            valuePtr = ladybug_value_create_int64(Int64(ladybugInt64.value))
+        case let ladybugInt32 as KuzuInt32Wrapper:
+            valuePtr = ladybug_value_create_int32(Int32(ladybugInt32.value))
+        case let ladybugInt16 as KuzuInt16Wrapper:
+            valuePtr = ladybug_value_create_int16(Int16(ladybugInt16.value))
+        case let ladybugInt8 as KuzuInt8Wrapper:
+            valuePtr = ladybug_value_create_int8(Int8(ladybugInt8.value))
+        case let ladybugFloat as KuzuFloatWrapper:
+            valuePtr = ladybug_value_create_float(Float(ladybugFloat.value))
+        case let ladybugDouble as KuzuDoubleWrapper:
+            valuePtr = ladybug_value_create_double(Double(ladybugDouble.value))
+        case let ladybugBool as KuzuBoolWrapper:
+            valuePtr = ladybug_value_create_bool(ladybugBool.value)
         case let string as String:
-            valuePtr = kuzu_value_create_string(string)
+            valuePtr = ladybug_value_create_string(string)
         case let date as Date:
             let timestamp = swiftDateToKuzuTimestamp(date)
-            valuePtr = kuzu_value_create_timestamp(timestamp)
+            valuePtr = ladybug_value_create_timestamp(timestamp)
         case let timeInterval as TimeInterval:
             let interval = swiftTimeIntervalToKuzuInterval(timeInterval)
-            valuePtr = kuzu_value_create_interval(interval)
+            valuePtr = ladybug_value_create_interval(interval)
         case let arrayOfMapItems as [(Any?, Any?)]:
             valuePtr = try swiftArrayOfMapItemsToKuzuMap(arrayOfMapItems)
         case let array as NSArray:
@@ -695,18 +695,18 @@ internal func swiftValueToKuzuValue(_ value: Any?)
 /// - Parameter cValue: The Kuzu value to convert.
 /// - Returns: A Swift value.
 /// - Throws: `KuzuError.getValueFailed` if the conversion fails.
-internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
-    if kuzu_value_is_null(&cValue) {
+internal func ladybugValueToSwift(_ cValue: inout ladybug_value) throws -> Any? {
+    if ladybug_value_is_null(&cValue) {
         return nil
     }
-    var logicalType = kuzu_logical_type()
-    kuzu_value_get_data_type(&cValue, &logicalType)
-    defer { kuzu_data_type_destroy(&logicalType) }
-    let logicalTypeId = kuzu_data_type_get_id(&logicalType)
+    var logicalType = ladybug_logical_type()
+    ladybug_value_get_data_type(&cValue, &logicalType)
+    defer { ladybug_data_type_destroy(&logicalType) }
+    let logicalTypeId = ladybug_data_type_get_id(&logicalType)
     switch logicalTypeId {
     case KUZU_BOOL:
         var value: Bool = Bool()
-        let state = kuzu_value_get_bool(&cValue, &value)
+        let state = ladybug_value_get_bool(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get bool value with status \(state)"
@@ -715,7 +715,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_INT64, KUZU_SERIAL:
         var value: Int64 = Int64()
-        let state = kuzu_value_get_int64(&cValue, &value)
+        let state = ladybug_value_get_int64(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get int64 value with status \(state)"
@@ -724,7 +724,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_INT32:
         var value: Int32 = Int32()
-        let state = kuzu_value_get_int32(&cValue, &value)
+        let state = ladybug_value_get_int32(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get int32 value with status \(state)"
@@ -733,7 +733,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_INT16:
         var value: Int16 = Int16()
-        let state = kuzu_value_get_int16(&cValue, &value)
+        let state = ladybug_value_get_int16(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get int16 value with status \(state)"
@@ -742,7 +742,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_INT8:
         var value: Int8 = Int8()
-        let state = kuzu_value_get_int8(&cValue, &value)
+        let state = ladybug_value_get_int8(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get int8 value with status \(state)"
@@ -750,15 +750,15 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         }
         return value
     case KUZU_INT128:
-        var int128Value = kuzu_int128_t()
-        let getValueState = kuzu_value_get_int128(&cValue, &int128Value)
+        var int128Value = ladybug_int128_t()
+        let getValueState = ladybug_value_get_int128(&cValue, &int128Value)
         if getValueState != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get int128 value with status \(getValueState)"
             )
         }
         var valueString: UnsafeMutablePointer<CChar>?
-        let valueConversionState = kuzu_int128_t_to_string(
+        let valueConversionState = ladybug_int128_t_to_string(
             int128Value,
             &valueString
         )
@@ -768,27 +768,27 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
             )
         }
         defer {
-            kuzu_destroy_string(valueString)
+            ladybug_destroy_string(valueString)
         }
         let decimalString = String(cString: valueString!)
         let decimal = Decimal(string: decimalString)
         return decimal
     case KUZU_UUID:
         var valueString: UnsafeMutablePointer<CChar>?
-        let state = kuzu_value_get_uuid(&cValue, &valueString)
+        let state = ladybug_value_get_uuid(&cValue, &valueString)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get uuid value with status \(state)"
             )
         }
         defer {
-            kuzu_destroy_string(valueString)
+            ladybug_destroy_string(valueString)
         }
         let uuidString = String(cString: valueString!)
         return UUID(uuidString: uuidString)!
     case KUZU_UINT64:
         var value: UInt64 = UInt64()
-        let state = kuzu_value_get_uint64(&cValue, &value)
+        let state = ladybug_value_get_uint64(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get uint64 value with status \(state)"
@@ -797,7 +797,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_UINT32:
         var value: UInt32 = UInt32()
-        let state = kuzu_value_get_uint32(&cValue, &value)
+        let state = ladybug_value_get_uint32(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get uint32 value with status \(state)"
@@ -806,7 +806,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_UINT16:
         var value: UInt16 = UInt16()
-        let state = kuzu_value_get_uint16(&cValue, &value)
+        let state = ladybug_value_get_uint16(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get uint16 value with status \(state)"
@@ -815,7 +815,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_UINT8:
         var value: UInt8 = UInt8()
-        let state = kuzu_value_get_uint8(&cValue, &value)
+        let state = ladybug_value_get_uint8(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get uint8 value with status \(state)"
@@ -824,7 +824,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_FLOAT:
         var value: Float = Float()
-        let state = kuzu_value_get_float(&cValue, &value)
+        let state = ladybug_value_get_float(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get float value with status \(state)"
@@ -833,7 +833,7 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_DOUBLE:
         var value: Double = Double()
-        let state = kuzu_value_get_double(&cValue, &value)
+        let state = ladybug_value_get_double(&cValue, &value)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get double value with status \(state)"
@@ -842,19 +842,19 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         return value
     case KUZU_STRING:
         var strValue: UnsafeMutablePointer<CChar>?
-        let state = kuzu_value_get_string(&cValue, &strValue)
+        let state = ladybug_value_get_string(&cValue, &strValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get string value with status \(state)"
             )
         }
         defer {
-            kuzu_destroy_string(strValue)
+            ladybug_destroy_string(strValue)
         }
         return String(cString: strValue!)
     case KUZU_TIMESTAMP:
-        var cTimestampValue = kuzu_timestamp_t()
-        let state = kuzu_value_get_timestamp(&cValue, &cTimestampValue)
+        var cTimestampValue = ladybug_timestamp_t()
+        let state = ladybug_value_get_timestamp(&cValue, &cTimestampValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get timestamp value with status \(state)"
@@ -864,8 +864,8 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         let seconds: Double = Double(microseconds) / MICROSECONDS_IN_A_SECOND
         return Date(timeIntervalSince1970: seconds)
     case KUZU_TIMESTAMP_NS:
-        var cTimestampValue = kuzu_timestamp_ns_t()
-        let state = kuzu_value_get_timestamp_ns(&cValue, &cTimestampValue)
+        var cTimestampValue = ladybug_timestamp_ns_t()
+        let state = ladybug_value_get_timestamp_ns(&cValue, &cTimestampValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get timestamp value with status \(state)"
@@ -875,8 +875,8 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         let seconds: Double = Double(nanoseconds) / NANOSECONDS_IN_A_SECOND
         return Date(timeIntervalSince1970: seconds)
     case KUZU_TIMESTAMP_MS:
-        var cTimestampValue = kuzu_timestamp_ms_t()
-        let state = kuzu_value_get_timestamp_ms(&cValue, &cTimestampValue)
+        var cTimestampValue = ladybug_timestamp_ms_t()
+        let state = ladybug_value_get_timestamp_ms(&cValue, &cTimestampValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get timestamp value with status \(state)"
@@ -886,8 +886,8 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         let seconds: Double = Double(milliseconds) / MILLISECONDS_IN_A_SECOND
         return Date(timeIntervalSince1970: seconds)
     case KUZU_TIMESTAMP_SEC:
-        var cTimestampValue = kuzu_timestamp_sec_t()
-        let state = kuzu_value_get_timestamp_sec(&cValue, &cTimestampValue)
+        var cTimestampValue = ladybug_timestamp_sec_t()
+        let state = ladybug_value_get_timestamp_sec(&cValue, &cTimestampValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get timestamp value with status \(state)"
@@ -896,8 +896,8 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         let seconds = cTimestampValue.value
         return Date(timeIntervalSince1970: Double(seconds))
     case KUZU_TIMESTAMP_TZ:
-        var cTimestampValue = kuzu_timestamp_tz_t()
-        let state = kuzu_value_get_timestamp_tz(&cValue, &cTimestampValue)
+        var cTimestampValue = ladybug_timestamp_tz_t()
+        let state = ladybug_value_get_timestamp_tz(&cValue, &cTimestampValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get timestamp value with status \(state)"
@@ -907,8 +907,8 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         let seconds: Double = Double(microseconds) / MICROSECONDS_IN_A_SECOND
         return Date(timeIntervalSince1970: seconds)
     case KUZU_DATE:
-        var cDateValue = kuzu_date_t()
-        let state = kuzu_value_get_date(&cValue, &cDateValue)
+        var cDateValue = ladybug_date_t()
+        let state = ladybug_value_get_date(&cValue, &cDateValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get date value with status \(state)"
@@ -918,17 +918,17 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         let seconds: Double = Double(days) * SECONDS_IN_A_DAY
         return Date(timeIntervalSince1970: seconds)
     case KUZU_INTERVAL:
-        var cIntervalValue = kuzu_interval_t()
-        let state = kuzu_value_get_interval(&cValue, &cIntervalValue)
+        var cIntervalValue = ladybug_interval_t()
+        let state = ladybug_value_get_interval(&cValue, &cIntervalValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get interval value with status \(state)"
             )
         }
-        return kuzuIntervalToSwiftTimeInterval(cIntervalValue)
+        return ladybugIntervalToSwiftTimeInterval(cIntervalValue)
     case KUZU_INTERNAL_ID:
-        var cInternalIdValue = kuzu_internal_id_t()
-        let state = kuzu_value_get_internal_id(&cValue, &cInternalIdValue)
+        var cInternalIdValue = ladybug_internal_id_t()
+        let state = ladybug_value_get_internal_id(&cValue, &cInternalIdValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get internal id value with status \(state)"
@@ -940,28 +940,28 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         )
     case KUZU_BLOB:
         var cBlobValue: UnsafeMutablePointer<UInt8>?
-        let state = kuzu_value_get_blob(&cValue, &cBlobValue)
+        let state = ladybug_value_get_blob(&cValue, &cBlobValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get blob value with status \(state)"
             )
         }
         defer {
-            kuzu_destroy_blob(cBlobValue)
+            ladybug_destroy_blob(cBlobValue)
         }
         let blobSize = strlen(cBlobValue!)
         let blobData = Data(bytes: cBlobValue!, count: blobSize)
         return blobData
     case KUZU_DECIMAL:
         var outString: UnsafeMutablePointer<CChar>?
-        let state = kuzu_value_get_decimal_as_string(&cValue, &outString)
+        let state = ladybug_value_get_decimal_as_string(&cValue, &outString)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Failed to get string value of decimal type with status: \(state)"
             )
         }
         defer {
-            kuzu_destroy_string(outString)
+            ladybug_destroy_string(outString)
         }
         let decimalString = String(cString: outString!)
         guard let decimal = Decimal(string: decimalString) else {
@@ -971,22 +971,22 @@ internal func kuzuValueToSwift(_ cValue: inout kuzu_value) throws -> Any? {
         }
         return decimal
     case KUZU_LIST, KUZU_ARRAY:
-        return try kuzuListToSwiftArray(&cValue)
+        return try ladybugListToSwiftArray(&cValue)
     case KUZU_STRUCT:
-        return try kuzuStructValueToSwiftDictionary(&cValue)
+        return try ladybugStructValueToSwiftDictionary(&cValue)
     case KUZU_UNION:
-        return try kuzuUnionValueToSwiftValue(&cValue)
+        return try ladybugUnionValueToSwiftValue(&cValue)
     case KUZU_MAP:
-        return try kuzuMapToSwiftArrayOfMapItems(&cValue)
+        return try ladybugMapToSwiftArrayOfMapItems(&cValue)
     case KUZU_NODE:
-        return try kuzuNodeValueToSwiftNode(&cValue)
+        return try ladybugNodeValueToSwiftNode(&cValue)
     case KUZU_REL:
-        return try kuzuRelValueToSwiftRelationship(&cValue)
+        return try ladybugRelValueToSwiftRelationship(&cValue)
     case KUZU_RECURSIVE_REL:
-        return try kuzuRecursiveRelValueToSwiftRecursiveRelationship(&cValue)
+        return try ladybugRecursiveRelValueToSwiftRecursiveRelationship(&cValue)
     default:
-        let valueString = kuzu_value_to_string(&cValue)
-        defer { kuzu_destroy_string(valueString) }
+        let valueString = ladybug_value_to_string(&cValue)
+        defer { ladybug_destroy_string(valueString) }
         throw KuzuError.valueConversionFailed(
             "Unsupported C value with value \(String(cString: valueString!)) and typeId \(logicalTypeId)"
         )

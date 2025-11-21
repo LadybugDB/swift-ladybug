@@ -1,0 +1,51 @@
+#include "processor/operator/simple/install_extension.h"
+
+#include "common/string_format.h"
+#include "extension/extension_manager.h"
+#include "processor/execution_context.h"
+
+namespace ladybug {
+namespace processor {
+
+using namespace ladybug::common;
+using namespace ladybug::extension;
+
+void InstallExtension::setOutputMessage(bool installed, storage::MemoryManager* memoryManager) {
+    if (info.forceInstall) {
+        appendMessage(
+            stringFormat("Extension: {} updated from the repo: {}.", info.name, info.repo),
+            memoryManager);
+        return;
+    }
+    if (installed) {
+        appendMessage(
+            stringFormat("Extension: {} installed from the repo: {}.", info.name, info.repo),
+            memoryManager);
+    } else {
+        appendMessage(
+            stringFormat(
+                "Extension: {} is already installed.\nTo update it, you can run: UPDATE {}.",
+                info.name, info.name),
+            memoryManager);
+    }
+}
+
+void InstallExtension::executeInternal(ExecutionContext* context) {
+    if (context->clientContext->getExtensionManager()->isStaticLinkedExtension(info.name)) {
+        appendMessage(stringFormat("Extension {} is already statically linked with the ladybug core. "
+                                   "No need to INSTALL.",
+                          info.name),
+            context->clientContext->getMemoryManager());
+        return;
+    }
+    auto clientContext = context->clientContext;
+    ExtensionInstaller installer{info, *clientContext};
+    bool installResult = installer.install();
+    setOutputMessage(installResult, clientContext->getMemoryManager());
+    if (info.forceInstall) {
+        KU_ASSERT(installResult);
+    }
+}
+
+} // namespace processor
+} // namespace ladybug

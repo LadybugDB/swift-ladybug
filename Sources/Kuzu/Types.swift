@@ -1,6 +1,6 @@
 //
-//  kuzu-swift
-//  https://github.com/kuzudb/kuzu-swift
+//  swift-ladybug
+//  https://github.com/LadybugDB/swift-ladybug
 //
 //  Copyright © 2023 - 2025 Kùzu Inc.
 //  This code is licensed under MIT license (see LICENSE for details)

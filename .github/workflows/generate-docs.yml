@@ -10,7 +10,7 @@ jobs:
       - name: Generate documentation
         run: |
           swift package --allow-writing-to-directory ./docs \
-              generate-documentation --target Kuzu --disable-indexing \
+              generate-documentation --target Ladybug --disable-indexing \
               --output-path ./docs \
               --transform-for-static-hosting \
               --hosting-base-path /api-docs/swift
@@ -19,12 +19,12 @@ jobs:
       - name: Zip documentation
         run: |
           mv docs swift
-          zip -r kuzu-swift-docs.zip swift
+          zip -r swift-ladybug-docs.zip swift
       - name: Upload documentation
         uses: actions/upload-artifact@v4
         with:
-          name: kuzu-swift-docs
-          path: kuzu-swift-docs.zip
+          name: swift-ladybug-docs
+          path: swift-ladybug-docs.zip
   update-docs:
     runs-on: ubuntu-22.04
     name: Update Documentation Repository
@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: kuzudb/api-docs
+          repository: ladybugdb/api-docs
           token: ${{ secrets.DOC_PUSH_TOKEN }}
           path: api-docs
       - name: Remove old documentations
@@ -41,19 +41,19 @@ jobs:
       - name: Download Swift docs
         uses: actions/download-artifact@v4
         with:
-          name: kuzu-swift-docs
+          name: swift-ladybug-docs
           path: api-docs
       - name: Unzip Swift docs
         run: |
           cd api-docs
-          unzip kuzu-swift-docs.zip
-          rm -f kuzu-swift-docs.zip
+          unzip swift-ladybug-docs.zip
+          rm -f swift-ladybug-docs.zip
       - name: Push changes
         working-directory: api-docs
         run: |
           git checkout -b "swift-documentation-update-${{ github.sha }}"
           git config --global user.name "CI User"
-          git config --global user.email "ci@kuzudb.com"
+          git config --global user.email "ci@ladybugdb.com"
           git add .
           git commit -m "Update Swift API documentations"
           git push -u origin "swift-documentation-update-${{ github.sha }}"

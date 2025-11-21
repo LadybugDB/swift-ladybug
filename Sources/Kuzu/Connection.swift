@@ -1,23 +1,23 @@
 //
-//  kuzu-swift
-//  https://github.com/kuzudb/kuzu-swift
+//  swift-ladybug
+//  https://github.com/LadybugDB/swift-ladybug
 //
 //  Copyright © 2023 - 2025 Kùzu Inc.
 //  This code is licensed under MIT license (see LICENSE for details)
 
-@_implementationOnly import cxx_kuzu
+@_implementationOnly import cxx_ladybug
 
 /// Represents a connection to a Kuzu database.
 public final class Connection: @unchecked Sendable {
-    internal var cConnection: kuzu_connection
+    internal var cConnection: ladybug_connection
     internal var database: Database
 
     /// Opens a connection to the specified database.
     /// - Parameter database: The database to connect to
     /// - Throws: KuzuError if connection initialization fails
     public init(_ database: Database) throws {
-        cConnection = kuzu_connection()
-        let state = kuzu_connection_init(&database.cDatabase, &self.cConnection)
+        cConnection = ladybug_connection()
+        let state = ladybug_connection_init(&database.cDatabase, &self.cConnection)
         if state != KuzuSuccess {
             throw KuzuError.connectionInitializationFailed(
                 "Connection initialization failed with error code: \(state)"
@@ -27,7 +27,7 @@ public final class Connection: @unchecked Sendable {
     }
 
     deinit {
-        kuzu_connection_destroy(&cConnection)
+        ladybug_connection_destroy(&cConnection)
     }
 
     /// Executes a query string and returns the result.
@@ -35,14 +35,14 @@ public final class Connection: @unchecked Sendable {
     /// - Returns: A QueryResult containing the results of the query
     /// - Throws: KuzuError if query execution fails
     public func query(_ cypher: String) throws -> QueryResult {
-        var cQueryResult = kuzu_query_result()
-        kuzu_connection_query(&cConnection, cypher, &cQueryResult)
-        if !kuzu_query_result_is_success(&cQueryResult) {
+        var cQueryResult = ladybug_query_result()
+        ladybug_connection_query(&cConnection, cypher, &cQueryResult)
+        if !ladybug_query_result_is_success(&cQueryResult) {
             let cErrorMesage: UnsafeMutablePointer<CChar>? =
-                kuzu_query_result_get_error_message(&cQueryResult)
+                ladybug_query_result_get_error_message(&cQueryResult)
             defer {
-                kuzu_query_result_destroy(&cQueryResult)
-                kuzu_destroy_string(cErrorMesage)
+                ladybug_query_result_destroy(&cQueryResult)
+                ladybug_destroy_string(cErrorMesage)
             }
             if cErrorMesage == nil {
                 throw KuzuError.queryExecutionFailed(
@@ -63,14 +63,14 @@ public final class Connection: @unchecked Sendable {
     /// - Returns: A PreparedStatement that can be used to execute the query with parameters
     /// - Throws: KuzuError if statement preparation fails
     public func prepare(_ cypher: String) throws -> PreparedStatement {
-        var cPreparedStatement = kuzu_prepared_statement()
-        kuzu_connection_prepare(&cConnection, cypher, &cPreparedStatement)
-        if !kuzu_prepared_statement_is_success(&cPreparedStatement) {
+        var cPreparedStatement = ladybug_prepared_statement()
+        ladybug_connection_prepare(&cConnection, cypher, &cPreparedStatement)
+        if !ladybug_prepared_statement_is_success(&cPreparedStatement) {
             let cErrorMesage: UnsafeMutablePointer<CChar>? =
-                kuzu_prepared_statement_get_error_message(&cPreparedStatement)
+                ladybug_prepared_statement_get_error_message(&cPreparedStatement)
             defer {
-                kuzu_destroy_string(cErrorMesage)
-                kuzu_prepared_statement_destroy(&cPreparedStatement)
+                ladybug_destroy_string(cErrorMesage)
+                ladybug_prepared_statement_destroy(&cPreparedStatement)
             }
             if cErrorMesage == nil {
                 throw KuzuError.prepareStatmentFailed(
@@ -95,13 +95,13 @@ public final class Connection: @unchecked Sendable {
         _ preparedStatement: PreparedStatement,
         _ parameters: [String: T?]
     ) throws -> QueryResult {
-        var cQueryResult = kuzu_query_result()
+        var cQueryResult = ladybug_query_result()
         for (key, value) in parameters {
             let cValue = try swiftValueToKuzuValue(value)
             defer {
-                kuzu_value_destroy(cValue)
+                ladybug_value_destroy(cValue)
             }
-            let state = kuzu_prepared_statement_bind_value(
+            let state = ladybug_prepared_statement_bind_value(
                 &preparedStatement.cPreparedStatement,
                 key,
                 cValue
@@ -112,17 +112,17 @@ public final class Connection: @unchecked Sendable {
                 )
             }
         }
-        kuzu_connection_execute(
+        ladybug_connection_execute(
             &cConnection,
             &preparedStatement.cPreparedStatement,
             &cQueryResult
         )
-        if !kuzu_query_result_is_success(&cQueryResult) {
+        if !ladybug_query_result_is_success(&cQueryResult) {
             let cErrorMesage: UnsafeMutablePointer<CChar>? =
-                kuzu_query_result_get_error_message(&cQueryResult)
+                ladybug_query_result_get_error_message(&cQueryResult)
             defer {
-                kuzu_query_result_destroy(&cQueryResult)
-                kuzu_destroy_string(cErrorMesage)
+                ladybug_query_result_destroy(&cQueryResult)
+                ladybug_destroy_string(cErrorMesage)
             }
             if cErrorMesage == nil {
                 throw KuzuError.queryExecutionFailed(
@@ -140,14 +140,14 @@ public final class Connection: @unchecked Sendable {
     /// Sets the maximum number of threads that can be used for executing a query in parallel.
     /// - Parameter numThreads: The maximum number of threads to use
     public func setMaxNumThreadForExec(_ numThreads: UInt64) {
-        kuzu_connection_set_max_num_thread_for_exec(&cConnection, numThreads)
+        ladybug_connection_set_max_num_thread_for_exec(&cConnection, numThreads)
     }
 
     /// Returns the maximum number of threads that can be used for executing a query in parallel.
     /// - Returns: The maximum number of threads
     public func getMaxNumThreadForExec() -> UInt64 {
         var numThreads = UInt64()
-        kuzu_connection_get_max_num_thread_for_exec(&cConnection, &numThreads)
+        ladybug_connection_get_max_num_thread_for_exec(&cConnection, &numThreads)
         return numThreads
     }
 
@@ -156,11 +156,11 @@ public final class Connection: @unchecked Sendable {
     /// If a query takes longer than the specified timeout, it will be interrupted.
     /// - Parameter milliseconds: The timeout duration in milliseconds
     public func setQueryTimeout(_ milliseconds: UInt64) {
-        kuzu_connection_set_query_timeout(&cConnection, milliseconds)
+        ladybug_connection_set_query_timeout(&cConnection, milliseconds)
     }
 
     /// Interrupts the execution of the current query on the connection.
     public func interrupt() {
-        kuzu_connection_interrupt(&cConnection)
+        ladybug_connection_interrupt(&cConnection)
     }
 }

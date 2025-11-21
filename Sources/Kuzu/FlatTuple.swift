@@ -1,39 +1,39 @@
 //
-//  kuzu-swift
-//  https://github.com/kuzudb/kuzu-swift
+//  swift-ladybug
+//  https://github.com/LadybugDB/swift-ladybug
 //
 //  Copyright © 2023 - 2025 Kùzu Inc.
 //  This code is licensed under MIT license (see LICENSE for details)
 
 import Foundation
-@_implementationOnly import cxx_kuzu
+@_implementationOnly import cxx_ladybug
 
 /// A class representing a row in the result set of a query.
 /// FlatTuple provides access to the values in a query result row and methods to convert them to different formats.
 /// It conforms to `CustomStringConvertible` protocol for easy string representation.
 public final class FlatTuple: CustomStringConvertible, @unchecked Sendable {
-    internal var cFlatTuple: kuzu_flat_tuple
+    internal var cFlatTuple: ladybug_flat_tuple
     internal var queryResult: QueryResult
 
     internal init(
         _ queryResult: QueryResult,
-        _ cFlatTuple: kuzu_flat_tuple
+        _ cFlatTuple: ladybug_flat_tuple
     ) {
         self.cFlatTuple = cFlatTuple
         self.queryResult = queryResult
     }
 
     deinit {
-        kuzu_flat_tuple_destroy(&cFlatTuple)
+        ladybug_flat_tuple_destroy(&cFlatTuple)
     }
 
     /// Returns the string representation of the FlatTuple.
     /// The string representation contains the values of the tuple separated by vertical bars.
     public var description: String {
-        let cString: UnsafeMutablePointer<CChar> = kuzu_flat_tuple_to_string(
+        let cString: UnsafeMutablePointer<CChar> = ladybug_flat_tuple_to_string(
             &cFlatTuple
         )
-        defer { kuzu_destroy_string(cString) }
+        defer { ladybug_destroy_string(cString) }
         return String(cString: cString)
     }
 
@@ -42,15 +42,15 @@ public final class FlatTuple: CustomStringConvertible, @unchecked Sendable {
     /// - Returns: The value at the specified index, or nil if the value is null.
     /// - Throws: `KuzuError.getValueFailed` if retrieving the value fails.
     public func getValue(_ index: UInt64) throws -> Any? {
-        var cValue = kuzu_value()
-        let state = kuzu_flat_tuple_get_value(&cFlatTuple, index, &cValue)
+        var cValue = ladybug_value()
+        let state = ladybug_flat_tuple_get_value(&cFlatTuple, index, &cValue)
         if state != KuzuSuccess {
             throw KuzuError.getValueFailed(
                 "Get value failed with error code: \(state)"
             )
         }
-        defer { kuzu_value_destroy(&cValue) }
-        return try kuzuValueToSwift(&cValue)
+        defer { ladybug_value_destroy(&cValue) }
+        return try ladybugValueToSwift(&cValue)
     }
 
     /// Returns the values of the FlatTuple as a dictionary.
