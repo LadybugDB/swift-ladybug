@@ -732,7 +732,8 @@ ladybug_state ladybug_value_get_string(ladybug_value* value, char** out_result) 
     return LadybugSuccess;
 }
 
-ladybug_state ladybug_value_get_blob(ladybug_value* value, uint8_t** out_result) {
+ladybug_state ladybug_value_get_blob(ladybug_value* value, uint8_t** out_result,
+    uint64_t* out_length) {
     auto logical_type_id = static_cast<Value*>(value->_value)->getDataType().getLogicalTypeID();
     if (logical_type_id != LogicalTypeID::BLOB) {
         return LadybugError;
@@ -740,6 +741,7 @@ ladybug_state ladybug_value_get_blob(ladybug_value* value, uint8_t** out_result)
     try {
         auto blob = static_cast<Value*>(value->_value)->getValue<std::string>();
         *out_result = (uint8_t*)convertToOwnedCString(blob);
+        *out_length = blob.size();
     } catch (Exception& e) {
         return LadybugError;
     }
