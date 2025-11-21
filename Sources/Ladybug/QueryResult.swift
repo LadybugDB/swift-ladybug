@@ -14,7 +14,7 @@ import Foundation
 public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
     Sendable
 {
-    internal var cQueryResult: ladybug_query_result
+    internal var cQueryResult: lbug_query_result
     internal var connection: Connection
     internal var columnNames: [String]?
 
@@ -43,20 +43,20 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
 
     internal init(
         _ connection: Connection,
-        _ cQueryResult: ladybug_query_result
+        _ cQueryResult: lbug_query_result
     ) {
         self.cQueryResult = cQueryResult
         self.connection = connection
     }
 
     deinit {
-        ladybug_query_result_destroy(&cQueryResult)
+        lbug_query_result_destroy(&cQueryResult)
     }
 
     /// Returns the string representation of the QueryResult.
     /// The string representation contains the column names and the tuples in the result set.
     public var description: String {
-        let cString: UnsafeMutablePointer<CChar> = ladybug_query_result_to_string(
+        let cString: UnsafeMutablePointer<CChar> = lbug_query_result_to_string(
             &cQueryResult
         )
         defer { free(UnsafeMutableRawPointer(mutating: cString)) }
@@ -65,7 +65,7 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
 
     /// Returns true if there is at least one more tuple in the result set.
     public func hasNext() -> Bool {
-        return ladybug_query_result_has_next(&cQueryResult)
+        return lbug_query_result_has_next(&cQueryResult)
     }
 
     /// Returns the next tuple in the result set.
@@ -75,9 +75,9 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
         if !self.hasNext() {
             return nil
         }
-        var cFlatTuple: ladybug_flat_tuple = ladybug_flat_tuple()
-        let state = ladybug_query_result_get_next(&cQueryResult, &cFlatTuple)
-        if state != LadybugSuccess {
+        var cFlatTuple: lbug_flat_tuple = lbug_flat_tuple()
+        let state = lbug_query_result_get_next(&cQueryResult, &cFlatTuple)
+        if state != LbugSuccess {
             throw LadybugError.getFlatTupleFailed(
                 "Get next failed with error code: \(state)"
             )
@@ -87,7 +87,7 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
 
     /// Returns true if not all query results are consumed when multiple query statements are executed.
     public func hasNextQueryResult() -> Bool {
-        return ladybug_query_result_has_next_query_result(&cQueryResult)
+        return lbug_query_result_has_next_query_result(&cQueryResult)
     }
 
     /// Returns the next query result when multiple query statements are executed.
@@ -97,12 +97,12 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
         if !self.hasNextQueryResult() {
             return nil
         }
-        var cNextQueryResult = ladybug_query_result()
-        let state = ladybug_query_result_get_next_query_result(
+        var cNextQueryResult = lbug_query_result()
+        let state = lbug_query_result_get_next_query_result(
             &cQueryResult,
             &cNextQueryResult
         )
-        if state != LadybugSuccess {
+        if state != LbugSuccess {
             throw LadybugError.getNextQueryResultFailed(
                 "Get next query result failed with error code: \(state)"
             )
@@ -113,7 +113,7 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
     /// Resets the iterator of the QueryResult. After calling this method, the `getNext`
     /// method can be called to iterate over the result set from the beginning.
     public func resetIterator() {
-        ladybug_query_result_reset_iterator(&cQueryResult)
+        lbug_query_result_reset_iterator(&cQueryResult)
     }
 
     /// Returns the column names of the QueryResult as an array of strings.
@@ -126,8 +126,8 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
         columnNames = []
         for i in UInt64(0)..<numColumns {
             var outputString: UnsafeMutablePointer<CChar>?
-            ladybug_query_result_get_column_name(&cQueryResult, i, &outputString)
-            defer { ladybug_destroy_string(outputString) }
+            lbug_query_result_get_column_name(&cQueryResult, i, &outputString)
+            defer { lbug_destroy_string(outputString) }
             let columnName = String(cString: outputString!)
             columnNames?.append(columnName)
         }
@@ -136,31 +136,31 @@ public final class QueryResult: CustomStringConvertible, Sequence, @unchecked
 
     /// Returns the number of columns in the QueryResult.
     public func getColumnCount() -> UInt64 {
-        return ladybug_query_result_get_num_columns(&cQueryResult)
+        return lbug_query_result_get_num_columns(&cQueryResult)
     }
 
     /// Returns the number of rows in the QueryResult.
     public func getRowCount() -> UInt64 {
-        return ladybug_query_result_get_num_tuples(&cQueryResult)
+        return lbug_query_result_get_num_tuples(&cQueryResult)
     }
 
     /// Returns the compiling time of the query in milliseconds.
     public func getCompilingTime() -> Double {
-        var cQuerySummary = ladybug_query_summary()
+        var cQuerySummary = lbug_query_summary()
         defer {
-            ladybug_query_summary_destroy(&cQuerySummary)
+            lbug_query_summary_destroy(&cQuerySummary)
         }
-        ladybug_query_result_get_query_summary(&cQueryResult, &cQuerySummary)
-        return ladybug_query_summary_get_compiling_time(&cQuerySummary)
+        lbug_query_result_get_query_summary(&cQueryResult, &cQuerySummary)
+        return lbug_query_summary_get_compiling_time(&cQuerySummary)
     }
 
     /// Returns the execution time of the query in milliseconds.
     public func getExecutionTime() -> Double {
-        var cQuerySummary = ladybug_query_summary()
+        var cQuerySummary = lbug_query_summary()
         defer {
-            ladybug_query_summary_destroy(&cQuerySummary)
+            lbug_query_summary_destroy(&cQuerySummary)
         }
-        ladybug_query_result_get_query_summary(&cQueryResult, &cQuerySummary)
-        return ladybug_query_summary_get_execution_time(&cQuerySummary)
+        lbug_query_result_get_query_summary(&cQueryResult, &cQuerySummary)
+        return lbug_query_summary_get_execution_time(&cQuerySummary)
     }
 }

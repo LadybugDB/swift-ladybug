@@ -11,7 +11,7 @@
 /// PreparedStatement can be used to execute a query with parameters.
 /// It is returned by the `prepare` method of Connection.
 public final class PreparedStatement: @unchecked Sendable {
-    internal var cPreparedStatement: ladybug_prepared_statement
+    internal var cPreparedStatement: lbug_prepared_statement
     internal var connection: Connection
 
     /// Initializes a new PreparedStatement instance.
@@ -20,13 +20,13 @@ public final class PreparedStatement: @unchecked Sendable {
     ///   - cPreparedStatement: The underlying C prepared statement.
     internal init(
         _ connection: Connection,
-        _ cPreparedStatement: ladybug_prepared_statement
+        _ cPreparedStatement: lbug_prepared_statement
     ) {
         self.cPreparedStatement = cPreparedStatement
         self.connection = connection
     }
 
     deinit {
-        ladybug_prepared_statement_destroy(&cPreparedStatement)
+        lbug_prepared_statement_destroy(&cPreparedStatement)
     }
 }

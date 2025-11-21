@@ -13,7 +13,7 @@ import Foundation
 /// The configuration includes settings for buffer pool size, thread management,
 /// compression, read-only mode, and database size limits.
 public final class SystemConfig: @unchecked Sendable {
-    internal var cSystemConfig: ladybug_system_config
+    internal var cSystemConfig: lbug_system_config
 
     /// Creates a new system configuration with default values.
     ///
@@ -24,7 +24,7 @@ public final class SystemConfig: @unchecked Sendable {
     /// - readOnly: false
     /// - threadQos: QOS_CLASS_DEFAULT (Apple platforms only)
     public init() {
-        cSystemConfig = ladybug_default_system_config()
+        cSystemConfig = lbug_default_system_config()
         #if os(iOS)
             cSystemConfig.buffer_pool_size = 2048 * 1024 * 1024
         #endif
