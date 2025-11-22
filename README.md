@@ -23,7 +23,7 @@ Alternatively, you can add the package through Xcode:
 
 ## Docs
 
-The API documentation for swift-ladybug is [available here](https://ladybugdb.github.io/api-docs/swift/documentation/ladybug/).
+The API documentation for swift-ladybug is [available here](https://docs.ladybugdb.com/client-apis/swift/).
 
 ## Examples
 
