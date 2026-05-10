@@ -34,8 +34,8 @@ A demo iOS application is [provided here](https://github.com/LadybugDB/swift-lad
 ## System requirements
 
 swift-ladybug requires Swift 5.9 or later. It supports the following platforms:
-- macOS v11 or later
-- iOS v14 or later
+- macOS v14 or later
+- iOS v17 or later
 - Linux platforms (see the [official documentation](https://www.swift.org/platform-support/) for the supported distros)
 
 Windows platform is not supported and there is no future plan to support it. 
