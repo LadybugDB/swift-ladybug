@@ -1,3 +1,6 @@
 [submodule "Sources/LadybugCpp"]
 	path = Sources/LadybugCpp
 	url = https://github.com/LadybugDB/ladybug
+[submodule "dataset"]
+	path = dataset
+	url = https://github.com/ladybugdb/dataset.git

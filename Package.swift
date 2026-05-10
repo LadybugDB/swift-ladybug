@@ -2,6 +2,10 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import Foundation
+
+let usePrebuiltLadybug = ProcessInfo.processInfo.environment["LBUG_USE_PREBUILT"] == "1"
+let prebuiltLadybugDirectory = ProcessInfo.processInfo.environment["LBUG_TARGET_DIR"] ?? "lib"
 
 let package = Package(
     name: "swift-ladybug",
@@ -25,7 +29,18 @@ let package = Package(
             name: "Ladybug",
             dependencies: ["cxx-ladybug"]
         ),
-        .target(
+        (usePrebuiltLadybug ? .target(
+            name: "cxx-ladybug",
+            path: "Sources/cxx-ladybug-prebuilt",
+            publicHeadersPath: "include",
+            linkerSettings: [
+                .unsafeFlags([
+                    "-L\(prebuiltLadybugDirectory)",
+                    "-Xlinker", "-rpath", "-Xlinker", prebuiltLadybugDirectory,
+                ]),
+                .linkedLibrary("lbug"),
+            ]
+        ) : .target(
             name: "cxx-ladybug",
             sources: [
                 "ladybug/build/src/extension/codegen/generated_extension_loader.cpp",
@@ -1133,16 +1148,16 @@ let package = Package(
                 .define("ANTLR4CPP_STATIC"),
                 .define("BM_MALLOC"),
                 .define("HAS_FULLFSYNC"),
-                .define("LADYBUG_CMAKE_VERSION", to: "\"0.11.3\""),
+                .define("LADYBUG_CMAKE_VERSION", to: "\"0.16.1\""),
                 .define("LADYBUG_EXPORTS"),
-                .define("LADYBUG_EXTENSION_VERSION", to: "\"0.11.3\""),
+                .define("LADYBUG_EXTENSION_VERSION", to: "\"0.16.1\""),
                 .define("LADYBUG_ROOT_DIRECTORY", to: "\"ladybug\""),
                 .define("ZSTDERRORLIB_VISIBILITY", to: ""),
                 .define("ZSTDLIB_VISIBILITY", to: ""),
                 .define("__SWIFT__"),
                 .define("zstd")
             ]
-        ),
+        )),
         .testTarget(
             name: "LadybugTests",
             dependencies: ["Ladybug"],

@@ -7,7 +7,7 @@ Official Swift language binding for [Ladybug](https://github.com/LadybugDB/ladyb
 To add swift-ladybug to your Swift project, you can use the Swift Package Manager:
 
 1. Add `.package(url: "https://github.com/LadybugDB/swift-ladybug/", branch: "main"),` to your Package.swift dependencies.
-   You can change the branch to a tag to use a specific version, e.g., `.package(url: "https://github.com/LadybugDB/swift-ladybug/", branch: "0.11.0"),` to use version 0.11.0.
+   You can change the branch to a tag to use a specific version, e.g., `.package(url: "https://github.com/LadybugDB/swift-ladybug/", branch: "0.16.1"),` to use version 0.16.1.
 2. Add `Ladybug` to your target dependencies.
    ```swift
     dependencies: [
@@ -44,20 +44,26 @@ The CI pipeline tests the package on macOS v15, Ubuntu 24.04, and iOS 18.6 Simul
 
 ## Build
 
-When building from a source checkout, initialize the Ladybug C++ submodule and
-generate the `cxx-ladybug` SwiftPM target before running `swift build`:
+### Source build
+
+When building from a source checkout, initialize only the top-level Ladybug C++
+submodule and generate the `cxx-ladybug` SwiftPM target before running
+`swift build`:
 
 ```bash
-git clone --recurse-submodules https://github.com/LadybugDB/swift-ladybug.git
+git clone https://github.com/LadybugDB/swift-ladybug.git
 cd swift-ladybug
-python3 Scripts/collect-ladybug-src/collect-ladybug-src.py
+git submodule update --init Sources/LadybugCpp dataset
+git -C Sources/LadybugCpp submodule update --init dataset
+python3 scripts/collect-ladybug-src/collect-ladybug-src.py
 swift build
 ```
 
 If you already cloned the repository without submodules, run this first:
 
 ```bash
-git submodule update --init --recursive
+git submodule update --init Sources/LadybugCpp dataset
+git -C Sources/LadybugCpp submodule update --init dataset
 ```
 
 After the generated target exists, subsequent builds can be run with:
@@ -65,6 +71,22 @@ After the generated target exists, subsequent builds can be run with:
 ```bash
 swift build
 ```
+
+### Prebuilt library build
+
+To skip compiling the Ladybug C++ sources, download a prebuilt `liblbug` archive
+and enable prebuilt mode:
+
+```bash
+bash scripts/download-liblbug.sh
+LBUG_USE_PREBUILT=1 swift build
+```
+
+By default the script downloads the latest shared library release from
+`LadybugDB/ladybug` into `lib/`. You can set `LBUG_VERSION`, `LBUG_LIB_KIND`,
+`LBUG_PRECOMPILED_RUN_ID`, `LBUG_GITHUB_REPOSITORY`, or `LBUG_TARGET_DIR` to
+select a specific release, static/shared archive, workflow artifact, repository,
+or install directory.
 
 ## Tests
 

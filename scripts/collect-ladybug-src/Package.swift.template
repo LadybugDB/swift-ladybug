@@ -2,6 +2,10 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import Foundation
+
+let usePrebuiltLadybug = ProcessInfo.processInfo.environment["LBUG_USE_PREBUILT"] == "1"
+let prebuiltLadybugDirectory = ProcessInfo.processInfo.environment["LBUG_TARGET_DIR"] ?? "lib"
 
 let package = Package(
     name: "swift-ladybug",
@@ -25,7 +29,18 @@ let package = Package(
             name: "Ladybug",
             dependencies: ["cxx-ladybug"]
         ),
-        .target(
+        (usePrebuiltLadybug ? .target(
+            name: "cxx-ladybug",
+            path: "Sources/cxx-ladybug-prebuilt",
+            publicHeadersPath: "include",
+            linkerSettings: [
+                .unsafeFlags([
+                    "-L\(prebuiltLadybugDirectory)",
+                    "-Xlinker", "-rpath", "-Xlinker", prebuiltLadybugDirectory,
+                ]),
+                .linkedLibrary("lbug"),
+            ]
+        ) : .target(
             name: "cxx-ladybug",
             sources: [
 $SOURCES
@@ -33,7 +48,7 @@ $SOURCES
             cxxSettings: [
 $CXX_SETTINGS
             ]
-        ),
+        )),
         .testTarget(
             name: "LadybugTests",
             dependencies: ["Ladybug"],

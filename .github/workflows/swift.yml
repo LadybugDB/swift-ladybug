@@ -24,45 +24,26 @@ jobs:
     name: Build and Test on ${{ matrix.runner }} (${{ matrix.config }})
     runs-on: ${{ matrix.runner }}
     steps:
-      - name: Install dependencies
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get update
-            sudo apt-get install -y ccache cmake ninja-build
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            brew install ccache cmake ninja
-          fi
       - name: Set up Swift
         if: matrix.runner == 'ubuntu-24.04'
         uses: swift-actions/setup-swift@v2
         with:
           swift-version: "5.10.1"
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Restore ccache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ccache-${{ runner.os }}-${{ matrix.config }}-${{ github.sha }}
-          restore-keys: |
-            ccache-${{ runner.os }}-${{ matrix.config }}-
-            ccache-${{ runner.os }}-
-      - name: Configure ccache
-        run: |
-          echo "CC=ccache clang" >> "$GITHUB_ENV"
-          echo "CXX=ccache clang++" >> "$GITHUB_ENV"
-          ccache --max-size="$CCACHE_MAXSIZE"
-          ccache --zero-stats
-      - name: Prepare ladybug sources
-        run: python3 Scripts/collect-ladybug-src/collect-ladybug-src.py
+      - name: Initialize dataset submodule
+        run: git submodule update --init dataset
+      - name: Download prebuilt ladybug
+        run: bash scripts/download-liblbug.sh
       - name: Build (${{ matrix.config }} mode)
         run: swift build -c ${{ matrix.config }}
+        env:
+          LBUG_USE_PREBUILT: "1"
+          LBUG_TARGET_DIR: ${{ github.workspace }}/lib
       - name: Run tests (${{ matrix.config }} mode)
         run: swift test -c ${{ matrix.config }}
-      - name: Show ccache stats
-        if: always()
-        run: ccache --show-stats
+        env:
+          LBUG_USE_PREBUILT: "1"
+          LBUG_TARGET_DIR: ${{ github.workspace }}/lib
 
   ios-simulator-test:
     name: Build and Test on iOS Simulator
@@ -80,7 +61,9 @@ jobs:
         run: brew install ccache cmake ninja
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: true
+      - name: Initialize Ladybug dataset submodule
+        run: git -C Sources/LadybugCpp submodule update --init dataset
       - name: Restore ccache
         uses: actions/cache@v4
         with:
@@ -96,7 +79,7 @@ jobs:
           ccache --max-size="$CCACHE_MAXSIZE"
           ccache --zero-stats
       - name: Prepare ladybug sources
-        run: python3 Scripts/collect-ladybug-src/collect-ladybug-src.py
+        run: python3 scripts/collect-ladybug-src/collect-ladybug-src.py
       - name: Build for iOS Simulator
         run: |
           xcodebuild build-for-testing \
@@ -123,27 +106,11 @@ jobs:
     name: Build and Run Example
     runs-on: macos-15
     steps:
-      - name: Install dependencies
-        run: brew install ccache cmake ninja
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Restore ccache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ccache-${{ runner.os }}-example-${{ github.sha }}
-          restore-keys: |
-            ccache-${{ runner.os }}-example-
-            ccache-${{ runner.os }}-
-      - name: Configure ccache
-        run: |
-          echo "CC=ccache clang" >> "$GITHUB_ENV"
-          echo "CXX=ccache clang++" >> "$GITHUB_ENV"
-          ccache --max-size="$CCACHE_MAXSIZE"
-          ccache --zero-stats
-      - name: Prepare ladybug sources
-        run: python3 Scripts/collect-ladybug-src/collect-ladybug-src.py
+      - name: Initialize dataset submodule
+        run: git submodule update --init dataset
+      - name: Download prebuilt ladybug
+        run: bash scripts/download-liblbug.sh
       - name: Build example project
         working-directory: Example
         run: |
@@ -154,10 +121,10 @@ jobs:
           swift build -c release
           # Copy the built binary to the current directory
           cp ./.build/arm64-apple-macosx/release/swift-ladybug-example .
+        env:
+          LBUG_USE_PREBUILT: "1"
+          LBUG_TARGET_DIR: ${{ github.workspace }}/lib
 
       - name: Run example
         working-directory: Example
         run: ./swift-ladybug-example
-      - name: Show ccache stats
-        if: always()
-        run: ccache --show-stats

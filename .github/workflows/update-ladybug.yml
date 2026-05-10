@@ -30,7 +30,7 @@ jobs:
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
       - name: Update Ladybug
-        working-directory: Scripts/update-ladybug
+        working-directory: scripts/update-ladybug
         run: python3 update-ladybug.py
       - name: Create Pull Request
         id: create-pr
