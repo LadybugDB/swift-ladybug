@@ -4,8 +4,8 @@ import PackageDescription
 let package = Package(
     name: "swift-ladybug-example",
     platforms: [
-        .macOS(.v11),
-        .iOS(.v14),
+        .macOS(.v14),
+        .iOS(.v17),
     ],
     dependencies: [
         .package(url: "https://github.com/LadybugDB/swift-ladybug/", branch: "main"),
