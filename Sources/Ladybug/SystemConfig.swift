@@ -43,6 +43,7 @@ public final class SystemConfig: @unchecked Sendable {
     ///   - maxNumThreads: The maximum number of threads that can be used by the database system. If 0, uses default (number of CPU cores).
     ///   - enableCompression: A boolean flag to enable or disable compression. Default is true.
     ///   - readOnly: A boolean flag to open the database in read-only mode. Default is false.
+    ///   - maxDBSize: The maximum database size in bytes. If 0, uses the Ladybug default.
     ///   - autoCheckpoint: Whether to automatically create checkpoints. Default is true.
     ///   - checkpointThreshold: The threshold for creating checkpoints. If set to UInt64.max, uses default value.
     public convenience init(
@@ -50,6 +51,7 @@ public final class SystemConfig: @unchecked Sendable {
         maxNumThreads: UInt64 = 0,
         enableCompression: Bool = true,
         readOnly: Bool = false,
+        maxDBSize: UInt64 = 0,
         autoCheckpoint: Bool = true,
         checkpointThreshold: UInt64 = UInt64.max
     ) {
@@ -62,6 +64,9 @@ public final class SystemConfig: @unchecked Sendable {
         }
         cSystemConfig.enable_compression = enableCompression
         cSystemConfig.read_only = readOnly
+        if maxDBSize > 0 {
+            cSystemConfig.max_db_size = maxDBSize
+        }
         cSystemConfig.auto_checkpoint = autoCheckpoint
         if checkpointThreshold > 0 {
             cSystemConfig.checkpoint_threshold = checkpointThreshold
@@ -77,6 +82,7 @@ public final class SystemConfig: @unchecked Sendable {
         ///   - maxNumThreads: The maximum number of threads that can be used by the database system. If 0, uses default (number of CPU cores).
         ///   - enableCompression: A boolean flag to enable or disable compression. Default is true.
         ///   - readOnly: A boolean flag to open the database in read-only mode. Default is false.
+        ///   - maxDBSize: The maximum database size in bytes. If 0, uses the Ladybug default.
         ///   - autoCheckpoint: Whether to automatically create checkpoints. Default is true.
         ///   - checkpointThreshold: The threshold for creating checkpoints. If set to UInt64.max, uses default value.
         ///   - threadQoS: The quality of service (QoS) for the worker threads. This is only available on Apple platforms. The default value is QOS_CLASS_DEFAULT.
@@ -85,6 +91,7 @@ public final class SystemConfig: @unchecked Sendable {
             maxNumThreads: UInt64 = 0,
             enableCompression: Bool = true,
             readOnly: Bool = false,
+            maxDBSize: UInt64 = 0,
             autoCheckpoint: Bool = true,
             checkpointThreshold: UInt64 = UInt64.max,
             threadQoS: qos_class_t = QOS_CLASS_DEFAULT
@@ -95,6 +102,7 @@ public final class SystemConfig: @unchecked Sendable {
                 maxNumThreads: maxNumThreads,
                 enableCompression: enableCompression,
                 readOnly: readOnly,
+                maxDBSize: maxDBSize,
                 autoCheckpoint: autoCheckpoint,
                 checkpointThreshold: checkpointThreshold
             )

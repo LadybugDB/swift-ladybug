@@ -32,6 +32,12 @@ public final class Database: @unchecked Sendable {
         if state == LbugSuccess {
             return
         } else {
+            let cErrorMessage = lbug_get_last_error()
+            defer { lbug_destroy_string(cErrorMessage) }
+            if let cErrorMessage {
+                let errorMessage = String(cString: cErrorMessage)
+                throw LadybugError.databaseInitializationFailed(errorMessage)
+            }
             throw LadybugError.databaseInitializationFailed(
                 "Database initialization failed with error code: \(state)"
             )

@@ -23,11 +23,16 @@ final class ExtensionTests: XCTestCase {
             maxNumThreads: 4,
             enableCompression: true,
             readOnly: false,
+            maxDBSize: 1024 * 1024 * 1024,
             autoCheckpoint: true,
             checkpointThreshold: UInt64.max
         )
         let db = try Ladybug.Database(":memory:", systemConfig)
         let conn = try Ladybug.Connection(db)
+        if ProcessInfo.processInfo.environment["LBUG_USE_PREBUILT"] == "1" {
+            _ = try conn.query("INSTALL ALGO;")
+            _ = try conn.query("LOAD EXTENSION ALGO;")
+        }
         _ = try conn.query(
             "CREATE NODE TABLE Node(id STRING PRIMARY KEY);"
         )

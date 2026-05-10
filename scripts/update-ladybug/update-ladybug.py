@@ -17,7 +17,7 @@ REPO_URL = "https://github.com/LadybugDB/ladybug.git"
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 LADYBUG_ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, LADYBUG))
 COLLECT_LADYBUG_SRC_SCRIPT_DIR = os.path.abspath(
-    os.path.join(ROOT_DIR, "Scripts", "collect-ladybug-src")
+    os.path.join(ROOT_DIR, "scripts", "collect-ladybug-src")
 )
 COLLECT_LADYBUG_SRC_SCRIPT_NAME = "collect-ladybug-src.py"
 LADYBUG_BRANCH = os.getenv("LADYBUG_BRANCH", "")
