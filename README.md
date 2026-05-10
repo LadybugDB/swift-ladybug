@@ -44,6 +44,24 @@ The CI pipeline tests the package on macOS v15, Ubuntu 24.04, and iOS 18.6 Simul
 
 ## Build
 
+When building from a source checkout, initialize the Ladybug C++ submodule and
+generate the `cxx-ladybug` SwiftPM target before running `swift build`:
+
+```bash
+git clone --recurse-submodules https://github.com/LadybugDB/swift-ladybug.git
+cd swift-ladybug
+python3 Scripts/collect-ladybug-src/collect-ladybug-src.py
+swift build
+```
+
+If you already cloned the repository without submodules, run this first:
+
+```bash
+git submodule update --init --recursive
+```
+
+After the generated target exists, subsequent builds can be run with:
+
 ```bash
 swift build
 ```
