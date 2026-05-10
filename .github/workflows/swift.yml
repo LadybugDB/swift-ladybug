@@ -31,9 +31,9 @@ jobs:
           fi
       - name: Set up Swift
         if: matrix.runner == 'ubuntu-24.04'
-        run: |
-          curl -L https://swiftlygo.xyz/install.sh | sudo bash
-          sudo swiftlygo install -y 5.10.1
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "5.10.1"
       - uses: actions/checkout@v4
         with:
           submodules: recursive
