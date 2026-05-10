@@ -51,12 +51,14 @@ jobs:
       - name: Configure ccache
         run: |
           mkdir -p "$RUNNER_TEMP/ccache-bin"
+          REAL_CC="$(command -v clang)"
+          REAL_CXX="$(command -v clang++)"
           for compiler in cc clang gcc; do
-            printf '#!/usr/bin/env bash\nexec ccache clang "$@"\n' > "$RUNNER_TEMP/ccache-bin/$compiler"
+            printf '#!/usr/bin/env bash\nexec ccache "%s" "$@"\n' "$REAL_CC" > "$RUNNER_TEMP/ccache-bin/$compiler"
             chmod +x "$RUNNER_TEMP/ccache-bin/$compiler"
           done
           for compiler in c++ clang++ g++; do
-            printf '#!/usr/bin/env bash\nexec ccache clang++ "$@"\n' > "$RUNNER_TEMP/ccache-bin/$compiler"
+            printf '#!/usr/bin/env bash\nexec ccache "%s" "$@"\n' "$REAL_CXX" > "$RUNNER_TEMP/ccache-bin/$compiler"
             chmod +x "$RUNNER_TEMP/ccache-bin/$compiler"
           done
           echo "$RUNNER_TEMP/ccache-bin" >> "$GITHUB_PATH"
@@ -102,12 +104,14 @@ jobs:
       - name: Configure ccache
         run: |
           mkdir -p "$RUNNER_TEMP/ccache-bin"
+          REAL_CC="$(command -v clang)"
+          REAL_CXX="$(command -v clang++)"
           for compiler in cc clang gcc; do
-            printf '#!/usr/bin/env bash\nexec ccache clang "$@"\n' > "$RUNNER_TEMP/ccache-bin/$compiler"
+            printf '#!/usr/bin/env bash\nexec ccache "%s" "$@"\n' "$REAL_CC" > "$RUNNER_TEMP/ccache-bin/$compiler"
             chmod +x "$RUNNER_TEMP/ccache-bin/$compiler"
           done
           for compiler in c++ clang++ g++; do
-            printf '#!/usr/bin/env bash\nexec ccache clang++ "$@"\n' > "$RUNNER_TEMP/ccache-bin/$compiler"
+            printf '#!/usr/bin/env bash\nexec ccache "%s" "$@"\n' "$REAL_CXX" > "$RUNNER_TEMP/ccache-bin/$compiler"
             chmod +x "$RUNNER_TEMP/ccache-bin/$compiler"
           done
           echo "$RUNNER_TEMP/ccache-bin" >> "$GITHUB_PATH"
@@ -159,12 +163,14 @@ jobs:
       - name: Configure ccache
         run: |
           mkdir -p "$RUNNER_TEMP/ccache-bin"
+          REAL_CC="$(command -v clang)"
+          REAL_CXX="$(command -v clang++)"
           for compiler in cc clang gcc; do
-            printf '#!/usr/bin/env bash\nexec ccache clang "$@"\n' > "$RUNNER_TEMP/ccache-bin/$compiler"
+            printf '#!/usr/bin/env bash\nexec ccache "%s" "$@"\n' "$REAL_CC" > "$RUNNER_TEMP/ccache-bin/$compiler"
             chmod +x "$RUNNER_TEMP/ccache-bin/$compiler"
           done
           for compiler in c++ clang++ g++; do
-            printf '#!/usr/bin/env bash\nexec ccache clang++ "$@"\n' > "$RUNNER_TEMP/ccache-bin/$compiler"
+            printf '#!/usr/bin/env bash\nexec ccache "%s" "$@"\n' "$REAL_CXX" > "$RUNNER_TEMP/ccache-bin/$compiler"
             chmod +x "$RUNNER_TEMP/ccache-bin/$compiler"
           done
           echo "$RUNNER_TEMP/ccache-bin" >> "$GITHUB_PATH"
