@@ -74,8 +74,6 @@ jobs:
             ccache-${{ runner.os }}-
       - name: Configure ccache
         run: |
-          echo "CC=ccache clang" >> "$GITHUB_ENV"
-          echo "CXX=ccache clang++" >> "$GITHUB_ENV"
           ccache --max-size="$CCACHE_MAXSIZE"
           ccache --zero-stats
       - name: Prepare ladybug sources
@@ -87,6 +85,8 @@ jobs:
             -destination "${{ matrix.destination }}" \
             -configuration ${{ matrix.config }} \
             ENABLE_TESTABILITY=YES \
+            C_COMPILER_LAUNCHER=ccache \
+            CLANG_ENABLE_EXPLICIT_MODULES_WITH_COMPILER_LAUNCHER=YES \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
       - name: Test on iOS Simulator
@@ -96,6 +96,8 @@ jobs:
             -destination "${{ matrix.destination }}" \
             -configuration ${{ matrix.config }} \
             ENABLE_TESTABILITY=YES \
+            C_COMPILER_LAUNCHER=ccache \
+            CLANG_ENABLE_EXPLICIT_MODULES_WITH_COMPILER_LAUNCHER=YES \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
       - name: Show ccache stats

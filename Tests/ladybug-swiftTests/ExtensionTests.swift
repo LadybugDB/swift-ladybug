@@ -11,6 +11,10 @@ import XCTest
 
 final class ExtensionTests: XCTestCase {
     func testGds() async throws {
+        #if os(iOS)
+            throw XCTSkip("ALGO extension installation is not available on iOS simulator")
+        #endif
+
         func normalize(_ rows: [[String]]) -> [[String]] {
             return
                 rows
