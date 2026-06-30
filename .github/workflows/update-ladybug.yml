@@ -7,7 +7,7 @@ on:
       branch:
         description: 'Branch name for ladybug, if not provided, it will use the master branch'
         type: string
-        default: 'master'
+        default: 'main'
 permissions:
   pull-requests: write
   contents: write
@@ -20,11 +20,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set Ladybug branch
-        run: |
-          if [ -z "${{ env.LADYBUG_BRANCH }}" ]; then
-            echo "LADYBUG_BRANCH=master" >> $GITHUB_ENV
-          fi
       - name: Configure Git
         run: |
           git config --global user.name "${GITHUB_ACTOR}"
