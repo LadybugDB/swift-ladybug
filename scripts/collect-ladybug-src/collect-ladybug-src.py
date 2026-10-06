@@ -102,6 +102,13 @@ for command in compile_commands:
         if arg.startswith("-I"):
             include_dir = arg.split("-I")[1]
             include_dir = os.path.relpath(include_dir, LADYBUG_ROOT_DIR)
+            # Skip include dirs outside the vendored tree (e.g. Homebrew OpenSSL).
+            # They cannot be expressed as SwiftPM headerSearchPaths, which must
+            # stay inside the package root, so keeping them breaks downstream
+            # resolution (seen with xcodebuild on iOS).
+            if include_dir == ".." or include_dir.startswith(f"..{os.sep}"):
+                logger.warning("Skipping out-of-package include dir: %s", arg)
+                continue
             include_dir = os.path.join(LADYBUG_TARGET, include_dir)
             include_dirs.add(include_dir)
     for arg in command_to_decode:
@@ -111,6 +118,14 @@ for command in compile_commands:
                 define = define.replace(LADYBUG_ROOT_DIR, LADYBUG_TARGET)
             # Skip defines that are not relevant to the build
             if define.startswith("__64BIT__") or define.startswith("__32BIT__"):
+                continue
+            # CPPHTTPLIB_OPENSSL_SUPPORT requires system OpenSSL headers, which
+            # live outside the package (see the include-dir filter above) and
+            # therefore cannot be used by SwiftPM targets. Building httplib
+            # without SSL support keeps from-source Apple builds working;
+            # the prebuilt liblbug used by default is unaffected.
+            if define == "CPPHTTPLIB_OPENSSL_SUPPORT":
+                logger.warning("Dropping CPPHTTPLIB_OPENSSL_SUPPORT for SwiftPM build")
                 continue
             if define == "NDEBUG" or define == "DEBUG" or define == "OS_MACOSX":
                 continue

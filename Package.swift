@@ -1229,7 +1229,6 @@ let package = Package(
             ],
             cxxSettings: [
                 .headerSearchPath("build/src/include/"),
-                .headerSearchPath("ladybug/../../../../../../opt/homebrew/Cellar/openssl@3/3.6.4/include"),
                 .headerSearchPath("ladybug/build/src"),
                 .headerSearchPath("ladybug/build/src/extension/codegen/include"),
                 .headerSearchPath("ladybug/build/src/include"),
@@ -1282,7 +1281,6 @@ let package = Package(
                 .headerSearchPath("ladybug/third_party/zstd/include/zstd/decompress"),
                 .define("ANTLR4CPP_STATIC"),
                 .define("BM_MALLOC"),
-                .define("CPPHTTPLIB_OPENSSL_SUPPORT"),
                 .define("HAS_FULLFSYNC"),
                 .define("ICEBUG_ENABLED"),
                 .define("LBUG_CMAKE_VERSION", to: "\"0.21.2\""),
