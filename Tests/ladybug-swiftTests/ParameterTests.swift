@@ -342,6 +342,8 @@ final class ParameterTests: XCTestCase {
     }
 
     func testMapWithMixedTypesParam() throws {
+        // Since Ladybug 0.17, mixed-type values are coerced to a common type
+        // (here STRING) instead of raising an error.
         #if os(Linux)
             let mapParam: [(String, Any)] = [
                 ("1", "One"),
@@ -358,12 +360,19 @@ final class ParameterTests: XCTestCase {
             ]
         #endif
         let preparedStatement = try conn.prepare("RETURN $1")
-        do {
-            _ = try conn.execute(preparedStatement, ["1": mapParam])
-            XCTFail("Expected error for mixed types")
-        } catch let error as LadybugError {
-            XCTAssertTrue(error.message.contains("the same type"))
+        let result = try conn.execute(preparedStatement, ["1": mapParam])
+        XCTAssertTrue(result.hasNext())
+        let tuple = try result.getNext()!
+        let value = try tuple.getValue(0) as! [(String, Any)]
+        XCTAssertEqual(value.count, mapParam.count)
+        let expected: [(String, String)] = [
+            ("1", "One"), ("2", "Two"), ("3", "Three"), ("4", "4"),
+        ]
+        for i in 0..<expected.count {
+            XCTAssertEqual(value[i].0, expected[i].0)
+            XCTAssertEqual(value[i].1 as! String, expected[i].1)
         }
+        XCTAssertFalse(result.hasNext())
     }
 
     func testArrayParam() throws {
@@ -455,6 +464,8 @@ final class ParameterTests: XCTestCase {
     }
 
     func testArrayWithMixedTypesParam() throws {
+        // Since Ladybug 0.17, mixed-type elements are coerced to a common type
+        // (here STRING) instead of raising an error.
         #if os(Linux)
             let arrayParam: [Any] = [
                 "One", "Two", "Three", LadybugInt64Wrapper(value: 4),
@@ -463,12 +474,16 @@ final class ParameterTests: XCTestCase {
             let arrayParam: [Any] = ["One", "Two", "Three", 4]
         #endif
         let preparedStatement = try conn.prepare("RETURN $1")
-        do {
-            _ = try conn.execute(preparedStatement, ["1": arrayParam])
-            XCTFail("Expected error for mixed types")
-        } catch let error as LadybugError {
-            XCTAssertTrue(error.message.contains("are of the same type"))
+        let result = try conn.execute(preparedStatement, ["1": arrayParam])
+        XCTAssertTrue(result.hasNext())
+        let tuple = try result.getNext()!
+        let value = try tuple.getValue(0) as! [Any]
+        let expected = ["One", "Two", "Three", "4"]
+        XCTAssertEqual(value.count, expected.count)
+        for i in 0..<expected.count {
+            XCTAssertEqual(value[i] as! String, expected[i])
         }
+        XCTAssertFalse(result.hasNext())
     }
 
     func testInt64ArrayParam() throws {
@@ -591,6 +606,8 @@ final class ParameterTests: XCTestCase {
     }
 
     func testDictionaryWithMixedTypesParam() throws {
+        // Since Ladybug 0.17, mixed-type values are coerced to a common type
+        // (here STRING) instead of raising an error.
         #if os(Linux)
             let dictParam: [(String, Any)] = [
                 ("1", "One"),
@@ -607,11 +624,18 @@ final class ParameterTests: XCTestCase {
             ]
         #endif
         let preparedStatement = try conn.prepare("RETURN $1")
-        do {
-            _ = try conn.execute(preparedStatement, ["1": dictParam])
-            XCTFail("Expected error for mixed types")
-        } catch let error as LadybugError {
-            XCTAssertTrue(error.message.contains("are of the same type"))
+        let result = try conn.execute(preparedStatement, ["1": dictParam])
+        XCTAssertTrue(result.hasNext())
+        let tuple = try result.getNext()!
+        let value = try tuple.getValue(0) as! [(String, Any)]
+        XCTAssertEqual(value.count, dictParam.count)
+        let expected: [(String, String)] = [
+            ("1", "One"), ("2", "Two"), ("3", "Three"), ("4", "4"),
+        ]
+        for i in 0..<expected.count {
+            XCTAssertEqual(value[i].0, expected[i].0)
+            XCTAssertEqual(value[i].1 as! String, expected[i].1)
         }
+        XCTAssertFalse(result.hasNext())
     }
 }
