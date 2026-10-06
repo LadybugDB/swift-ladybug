@@ -6,7 +6,7 @@ LIB_KIND="${LBUG_LIB_KIND:-shared}"
 LINUX_VARIANT="${LBUG_LINUX_VARIANT:-compat}"
 REPOSITORY="${LBUG_GITHUB_REPOSITORY:-LadybugDB/ladybug}"
 RUN_ID="${LBUG_PRECOMPILED_RUN_ID:-}"
-VERSION_OVERRIDE="${LBUG_VERSION:-0.16.1}"
+VERSION_OVERRIDE="${LBUG_VERSION:-0.21.2}"
 
 if [ "$LIB_KIND" != "shared" ] && [ "$LIB_KIND" != "static" ]; then
   echo "Unsupported LBUG_LIB_KIND: $LIB_KIND (expected 'shared' or 'static')" >&2
