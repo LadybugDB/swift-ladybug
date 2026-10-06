@@ -20,7 +20,7 @@ let package = Package(
             targets: ["Ladybug"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-docc-plugin", branch: "1.4.5"),
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.5"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
