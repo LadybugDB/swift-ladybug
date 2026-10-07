@@ -37,17 +37,18 @@ jobs:
       - name: Build (${{ matrix.config }} mode)
         run: swift build -c ${{ matrix.config }}
         env:
-          LBUG_USE_PREBUILT: "1"
           LBUG_TARGET_DIR: ${{ github.workspace }}/lib
       - name: Run tests (${{ matrix.config }} mode)
         run: swift test -c ${{ matrix.config }}
         env:
-          LBUG_USE_PREBUILT: "1"
           LBUG_TARGET_DIR: ${{ github.workspace }}/lib
 
   ios-simulator-test:
     name: Build and Test on iOS Simulator
     runs-on: macos-15
+    # iOS has no prebuilt liblbug yet: build the vendored C++ sources.
+    env:
+      LBUG_USE_PREBUILT: "0"
     strategy:
       matrix:
         include:
@@ -123,9 +124,8 @@ jobs:
           swift build -c release
           # Copy the built binary to the current directory
           cp ./.build/arm64-apple-macosx/release/swift-ladybug-example .
-        env:
-          LBUG_USE_PREBUILT: "1"
-          LBUG_TARGET_DIR: ${{ github.workspace }}/lib
+        # No LBUG_* env: exercises the zero-config prebuilt default
+        # (manifest resolves <package>/lib via #filePath).
 
       - name: Run example
         working-directory: Example

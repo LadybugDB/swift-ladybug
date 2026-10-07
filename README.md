@@ -44,11 +44,37 @@ The CI pipeline tests the package on macOS v15, Ubuntu 24.04, and iOS 18.6 Simul
 
 ## Build
 
-### Source build
+### Prebuilt library build (default)
 
-When building from a source checkout, initialize only the top-level Ladybug C++
-submodule and generate the `cxx-ladybug` SwiftPM target before running
-`swift build`:
+By default swift-ladybug links against a prebuilt `liblbug` shared library, so
+neither fresh clones nor downstream packages need to compile the Ladybug C++
+sources. Download the library for your platform, then build normally:
+
+```bash
+bash scripts/download-liblbug.sh
+swift build
+```
+
+By default the script downloads the shared library release matching
+`LBUG_VERSION` (default `0.21.2`) from `LadybugDB/ladybug` into `lib/`, which
+the package links automatically. You can set `LBUG_VERSION`, `LBUG_LIB_KIND`,
+`LBUG_LINUX_VARIANT`, `LBUG_PRECOMPILED_RUN_ID`, `LBUG_GITHUB_REPOSITORY`, or
+`LBUG_TARGET_DIR` to select a specific release, static/shared archive, Linux
+variant, workflow artifact, repository, or install directory (`LBUG_TARGET_DIR`
+overrides the default `<package>/lib` lookup).
+
+If you consume swift-ladybug as a package dependency, run the download script
+from inside the resolved checkout (e.g.
+`.build/checkouts/swift-ladybug/scripts/download-liblbug.sh`, or under Xcode
+the `SourcePackages/checkouts` directory in DerivedData) so the library lands
+in that checkout's `lib/` directory, then build your project with no extra
+configuration.
+
+### Source build (opt-in)
+
+To compile the Ladybug C++ sources from scratch instead of using the prebuilt
+library, initialize the submodules, generate the `cxx-ladybug` SwiftPM target,
+and opt out of prebuilt mode:
 
 ```bash
 git clone https://github.com/LadybugDB/swift-ladybug.git
@@ -56,37 +82,13 @@ cd swift-ladybug
 git submodule update --init Sources/LadybugCpp dataset
 git -C Sources/LadybugCpp submodule update --init dataset
 python3 scripts/collect-ladybug-src/collect-ladybug-src.py
-swift build
+LBUG_USE_PREBUILT=0 swift build
 ```
 
-If you already cloned the repository without submodules, run this first:
-
-```bash
-git submodule update --init Sources/LadybugCpp dataset
-git -C Sources/LadybugCpp submodule update --init dataset
-```
-
-After the generated target exists, subsequent builds can be run with:
-
-```bash
-swift build
-```
-
-### Prebuilt library build
-
-To skip compiling the Ladybug C++ sources, download a prebuilt `liblbug` archive
-and enable prebuilt mode:
-
-```bash
-bash scripts/download-liblbug.sh
-LBUG_USE_PREBUILT=1 swift build
-```
-
-By default the script downloads the latest shared library release from
-`LadybugDB/ladybug` into `lib/`. You can set `LBUG_VERSION`, `LBUG_LIB_KIND`,
-`LBUG_PRECOMPILED_RUN_ID`, `LBUG_GITHUB_REPOSITORY`, or `LBUG_TARGET_DIR` to
-select a specific release, static/shared archive, workflow artifact, repository,
-or install directory.
+Set `LBUG_USE_PREBUILT=0` whenever building or testing from source (including
+`swift test`). Source builds require the submodules and only work from a full
+clone, not from a package checkout. iOS device/simulator builds currently use
+this path; a prebuilt XCFramework for iOS is planned (see issue #12).
 
 ## Tests
 
