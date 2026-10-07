@@ -128,6 +128,12 @@ if [ ! -f "$TARGET_DIR/lbug.h" ]; then
   echo "Archive ${ARCHIVE} did not contain lbug.h" >&2
   exit 1
 fi
-cp "$TARGET_DIR/lbug.h" "$HEADER_DIR/lbug.h"
+# The header is checked in and kept in sync with releases, so refresh it
+# only when the archive differs. Package checkouts can be read-only, in
+# which case make the header writable before overwriting it.
+if [ ! -f "$HEADER_DIR/lbug.h" ] || ! cmp -s "$TARGET_DIR/lbug.h" "$HEADER_DIR/lbug.h"; then
+  [ ! -e "$HEADER_DIR/lbug.h" ] || chmod u+w "$HEADER_DIR/lbug.h"
+  cp "$TARGET_DIR/lbug.h" "$HEADER_DIR/lbug.h"
+fi
 
 echo "Installed ${ARCHIVE} from ${SOURCE_DESC} to $TARGET_DIR"

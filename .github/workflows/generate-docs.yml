@@ -7,6 +7,8 @@ jobs:
     name: Generate Documentation
     steps:
       - uses: actions/checkout@v4
+      - name: Download prebuilt ladybug
+        run: bash scripts/download-liblbug.sh
       - name: Generate documentation
         run: |
           swift package --allow-writing-to-directory ./docs \

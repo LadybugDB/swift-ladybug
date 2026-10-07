@@ -4,8 +4,15 @@
 import PackageDescription
 import Foundation
 
-let usePrebuiltLadybug = ProcessInfo.processInfo.environment["LBUG_USE_PREBUILT"] == "1"
-let prebuiltLadybugDirectory = ProcessInfo.processInfo.environment["LBUG_TARGET_DIR"] ?? "lib"
+// Prebuilt liblbug is the default so that fresh clones and downstream
+// packages build without generating the cxx-ladybug source tree.
+// Set LBUG_USE_PREBUILT=0 to build from the vendored C++ submodule instead.
+let usePrebuiltLadybug = ProcessInfo.processInfo.environment["LBUG_USE_PREBUILT"] != "0"
+// Default to <this package>/lib so downstream packages link without extra
+// configuration once scripts/download-liblbug.sh has run in this checkout.
+// LBUG_TARGET_DIR overrides the lookup (e.g. a shared CI directory).
+let packageDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent().path
+let prebuiltLadybugDirectory = ProcessInfo.processInfo.environment["LBUG_TARGET_DIR"] ?? "\(packageDirectory)/lib"
 
 let package = Package(
     name: "swift-ladybug",

@@ -8,6 +8,8 @@ Usage:
   nested `dataset`/`extension` submodules the source collection needs).
 - Regenerates Package.swift via collect-ladybug-src.py.
 - Bumps the default LBUG_VERSION in scripts/download-liblbug.sh.
+- Refreshes the checked-in prebuilt C API header
+  (Sources/cxx-ladybug-prebuilt/include/lbug.h) from the submodule.
 - Validates the result with `swift package dump-package`.
 
 Changes are left uncommitted so the caller (CI or a developer) can
@@ -38,6 +40,12 @@ NESTED_SUBMODULES = ["dataset", "extension"]
 COLLECT_SCRIPT_DIR = os.path.join(ROOT_DIR, "scripts", "collect-ladybug-src")
 COLLECT_SCRIPT = os.path.join(COLLECT_SCRIPT_DIR, "collect-ladybug-src.py")
 DOWNLOAD_SCRIPT = os.path.join(ROOT_DIR, "scripts", "download-liblbug.sh")
+SUBMODULE_C_HEADER = os.path.join(
+    SUBMODULE_DIR, "src", "include", "c_api", "lbug.h"
+)
+PREBUILT_HEADER = os.path.join(
+    ROOT_DIR, "Sources", "cxx-ladybug-prebuilt", "include", "lbug.h"
+)
 VERSION_PATTERN = re.compile(r"^v?\d+\.\d+\.\d+$")
 
 
@@ -108,6 +116,28 @@ def update_download_script_default(tag):
         logger.info("Prebuilt liblbug default already at %s", bare)
 
 
+def update_prebuilt_header(tag):
+    """Refresh the checked-in prebuilt lbug.h from the updated submodule.
+
+    The header ships byte-identical in the submodule source tree and the
+    published liblbug archives, so copying it keeps the prebuilt target's
+    module in sync with the version the download script installs.
+    """
+    with open(SUBMODULE_C_HEADER, "rb") as f:
+        header = f.read()
+    try:
+        with open(PREBUILT_HEADER, "rb") as f:
+            current = f.read()
+    except FileNotFoundError:
+        current = None
+    if header != current:
+        with open(PREBUILT_HEADER, "wb") as f:
+            f.write(header)
+        logger.info("Refreshed prebuilt lbug.h from %s", tag)
+    else:
+        logger.info("Prebuilt lbug.h already up to date for %s", tag)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -133,6 +163,7 @@ def main():
 
     run([sys.executable, COLLECT_SCRIPT], cwd=COLLECT_SCRIPT_DIR)
     update_download_script_default(tag)
+    update_prebuilt_header(tag)
 
     run(["swift", "package", "dump-package"], cwd=ROOT_DIR,
         stdout=subprocess.DEVNULL)

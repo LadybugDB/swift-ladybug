@@ -16,4 +16,3 @@ Sources/cxx-ladybug/ladybug/
 
 # Downloaded by scripts/download-liblbug.sh
 /lib/
-Sources/cxx-ladybug-prebuilt/include/lbug.h

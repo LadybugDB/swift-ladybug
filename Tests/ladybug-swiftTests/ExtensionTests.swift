@@ -33,7 +33,9 @@ final class ExtensionTests: XCTestCase {
         )
         let db = try Ladybug.Database(":memory:", systemConfig)
         let conn = try Ladybug.Connection(db)
-        if ProcessInfo.processInfo.environment["LBUG_USE_PREBUILT"] == "1" {
+        // Prebuilt liblbug is the default (LBUG_USE_PREBUILT=0 opts into a
+        // from-source build), so this matches the Package.swift default.
+        if ProcessInfo.processInfo.environment["LBUG_USE_PREBUILT"] != "0" {
             do {
                 _ = try conn.query("INSTALL ALGO;")
                 _ = try conn.query("LOAD EXTENSION ALGO;")
