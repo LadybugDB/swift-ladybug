@@ -80,7 +80,7 @@ if status != 0:
 logger.info("Generating cmake compile commands...")
 os.makedirs(LADYBUG_BUILD_DIR, exist_ok=True)
 
-status = Popen("cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHELL=FALSE -DBUILD_BENCHMARK=FALSE -DBUILD_TESTS=FALSE -DBUILD_SWIFT=TRUE ..", cwd=LADYBUG_BUILD_DIR, shell=True).wait()
+status = Popen("cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHELL=FALSE -DBUILD_BENCHMARK=FALSE -DBUILD_TESTS=FALSE -DBUILD_SWIFT=TRUE -DICEBUG_ENABLED=OFF ..", cwd=LADYBUG_BUILD_DIR, shell=True).wait()
 if status != 0:
     logger.error("Failed to cmake ladybug")
     exit(1)
