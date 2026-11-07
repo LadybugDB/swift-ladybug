@@ -25,11 +25,12 @@ jobs:
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
       - name: Install OpenSSL 3
-        run: brew install openssl@3
+        run: brew install openssl@3 libomp
       - name: Update Ladybug
         working-directory: scripts/update-ladybug
         env:
           OPENSSL_ROOT_DIR: /opt/homebrew/opt/openssl@3
+          CMAKE_PREFIX_PATH: /opt/homebrew/opt/libomp
         run: python3 update-ladybug.py
       - name: Resolve updated version
         id: version
